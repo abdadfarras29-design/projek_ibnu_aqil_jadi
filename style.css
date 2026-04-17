@@ -1,0 +1,602 @@
+/* ===========================
+   CSS VARIABLES
+   =========================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-green: #10b981;
+    --dark-green: #059669;
+    --light-green: #34d399;
+    --white: #ffffff;
+    --light-gray: #f0fdf4;
+    --text-dark: #1f2937;
+    --text-gray: #6b7280;
+}
+
+/* ===========================
+   GENERAL STYLES
+   =========================== */
+body {
+    font-family: 'Poppins', Tahoma, Geneva, sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+/* ===========================
+   NAVIGATION
+   =========================== */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+    padding: 1rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+
+}
+
+.logo {
+    color: var(--white);
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    /* Menambah jarak antara logo dan teks */
+    text-align: left;
+    line-height: 1.2;
+}
+
+.logo-img {
+    height: 50px;
+    /* Ukuran tinggi logo */
+    width: auto;
+    object-fit: contain;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-menu a {
+    color: var(--white);
+    text-decoration: none;
+    transition: all 0.3s;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-menu a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Dropdown Styles */
+.dropdown {
+    position: relative;
+}
+
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--white);
+    min-width: 180px;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    border-radius: 10px;
+    top: calc(100% + 8px);
+    left: 0;
+    list-style: none;
+    padding: 0.4rem 0;
+    overflow: hidden;
+    border-top: 3px solid var(--primary-green);
+    animation: fadeIn 0.25s ease;
+}
+
+.dropdown-content.open {
+    display: block;
+}
+
+.dropdown-content li a {
+    color: var(--text-dark) !important;
+    padding: 10px 18px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 0;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: none;
+    transform: none;
+}
+
+.dropdown-content li a:hover {
+    background-color: var(--light-gray);
+    color: var(--primary-green) !important;
+    padding-left: 24px;
+    transform: none;
+}
+
+
+/* PPDB Button Style */
+.nav-ppdb-btn {
+    background: #f59e0b !important;
+    color: var(--white) !important;
+    padding: 0.45rem 1.2rem !important;
+    border-radius: 50px !important;
+    font-weight: bold !important;
+    transition: all 0.3s !important;
+    border: 2px solid #f59e0b;
+}
+
+.nav-ppdb-btn:hover {
+    background: transparent !important;
+    color: #f59e0b !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Login Button Style */
+.nav-login-btn {
+    background: var(--white) !important;
+    color: var(--primary-green) !important;
+    padding: 0.45rem 1.2rem !important;
+    border-radius: 50px !important;
+    font-weight: bold !important;
+    transition: all 0.3s !important;
+    border: 2px solid var(--white);
+}
+
+.nav-login-btn:hover {
+    background: transparent !important;
+    color: var(--white) !important;
+    transform: translateY(-2px) !important;
+}
+
+.nav-menu a.active {
+    background: rgba(255, 255, 255, 0.3);
+    font-weight: bold;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 4px;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: var(--white);
+    border-radius: 3px;
+    transition: 0.3s;
+}
+
+/* ===========================
+   HERO SECTION
+   =========================== */
+.hero {
+    background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 50%, var(--dark-green) 100%);
+    padding: 8rem 2rem 4rem;
+    text-align: center;
+    color: var(--white);
+    margin-top: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('unnamed.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.2;
+    /* Dibuat sangat transparan */
+    z-index: 0;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><circle cx="100" cy="100" r="50" fill="rgba(255,255,255,0.1)"/><circle cx="900" cy="400" r="70" fill="rgba(255,255,255,0.1)"/><circle cx="1100" cy="150" r="40" fill="rgba(255,255,255,0.1)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: fadeInUp 1s ease;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    animation: fadeInUp 1s ease 0.2s backwards;
+}
+
+.cta-button {
+    background: var(--white);
+    color: var(--primary-green);
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    animation: fadeInUp 1s ease 0.4s backwards;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ===========================
+   SECTIONS
+   =========================== */
+.section {
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: none;
+}
+
+.section.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--dark-green);
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--light-green), var(--dark-green));
+    border-radius: 2px;
+}
+
+/* ===========================
+   STATISTICS
+   =========================== */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--light-green), var(--primary-green));
+    color: var(--white);
+    border-radius: 15px;
+    transition: all 0.3s;
+}
+
+.stat-box:hover {
+    transform: scale(1.05);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* ===========================
+   CARDS
+   =========================== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+    border-color: var(--light-green);
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--light-green), var(--primary-green));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+}
+
+.card h3 {
+    color: var(--dark-green);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.card p {
+    color: var(--text-gray);
+    line-height: 1.8;
+}
+
+/* ===========================
+   PROFILE SECTION
+   =========================== */
+.profile-container {
+    background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.profile-item {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-green);
+}
+
+.profile-item h4 {
+    color: var(--dark-green);
+    margin-bottom: 0.5rem;
+}
+
+/* ===========================
+   VISION MISSION
+   =========================== */
+.vision-mission-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 3rem;
+}
+
+.vm-box {
+    background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+    padding: 2rem;
+    border-radius: 15px;
+    border-top: 5px solid var(--primary-green);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.vm-box h3 {
+    color: var(--dark-green);
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+}
+
+.vm-box ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.vm-box li {
+    padding: 0.8rem 0;
+    padding-left: 2rem;
+    position: relative;
+    color: var(--text-gray);
+}
+
+.vm-box li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--primary-green);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* ===========================
+   CONTACT SECTION
+   =========================== */
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.contact-card {
+    background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+    color: var(--white);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.contact-card:hover {
+    transform: scale(1.05);
+}
+
+.contact-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.contact-card h3 {
+    margin-bottom: 1rem;
+}
+
+.contact-card a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    transition: all 0.3s;
+}
+
+.contact-card a:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===========================
+   LOCATION MAP
+   =========================== */
+.map-container {
+    width: 100%;
+    height: 450px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ===========================
+   FOOTER
+   =========================== */
+footer {
+    background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
+    color: var(--white);
+    text-align: center;
+    padding: 2rem;
+    margin-top: 4rem;
+}
+
+/* ===========================
+   ANIMATIONS
+   =========================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-menu {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+        padding: 2rem 0;
+    }
+
+    .nav-menu.active {
+        left: 0;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .vision-mission-container {
+        grid-template-columns: 1fr;
+    }
+}

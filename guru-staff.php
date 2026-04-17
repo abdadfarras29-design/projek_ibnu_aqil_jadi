@@ -1,0 +1,229 @@
+<?php
+require_once 'koneksi.php';
+$res_guru = mysqli_query($KONEKSI, "SELECT * FROM `nama guru & staff` ORDER BY id ASC");
+$daftar_guru = [];
+if ($res_guru) {
+    while ($row = mysqli_fetch_assoc($res_guru)) {
+        $daftar_guru[] = $row;
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guru & Staff - Website Sekolah</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="Screenshot_2026-02-22-13-16-05-58_1c337646f29875672b5a61192b9010f9.png"
+                    alt="Logo SMP IBNU AQIL" class="logo-img">
+                SMP IBNU AQIL
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.php">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn active">Tentang ▾</a>
+                    <ul class="dropdown-content">
+                        <li><a href="profile.php">Profil Sekolah</a></li>
+                        <li><a href="visi-misi.php">Visi & Misi</a></li>
+                        <li><a href="guru-staff.php" class="active">Guru & Staff</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Kegiatan ▾</a>
+                    <ul class="dropdown-content">
+                        <li><a href="berita.php">Berita</a></li>
+                        <li><a href="fasilitas.php">Fasilitas</a></li>
+                        <li><a href="ekskul.php">Ekstrakulikuler</a></li>
+                        <li><a href="galeri.php">Galeri</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Kontak ▾</a>
+                    <ul class="dropdown-content">
+                        <li><a href="lokasi.php">Lokasi</a></li>
+                        <li><a href="hubungi.php">Hubungi</a></li>
+                        <li><a href="pesan.php">Kirim Pesan</a></li>
+                    </ul>
+                </li>
+                <li><a href="https://s.id/brosur_PPDB_IBNU_AQIL_BOGOR_2024_2025" target="_blank">PPDB</a></li>
+                <li><a href="login.php" class="nav-login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <style>
+        .premium-hero {
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+            padding: 8rem 2rem 5rem;
+            text-align: center;
+            color: white;
+            border-radius: 0 0 50px 50px;
+            margin-bottom: 4rem;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .premium-hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .premium-hero p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            font-weight: 300;
+        }
+
+        .guru-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            padding: 0 2rem;
+            max-width: 1250px;
+            margin: 0 auto 6rem;
+        }
+
+        .guru-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .guru-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .guru-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .guru-card:hover::before {
+            opacity: 1;
+        }
+
+        .guru-foto {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1.5rem;
+            border: 4px solid var(--light-green);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+            transition: transform 0.4s ease;
+        }
+
+        .guru-card:hover .guru-foto {
+            transform: scale(1.05);
+        }
+
+        .guru-card h3 {
+            font-size: 1.3rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .guru-card p {
+            color: var(--primary-green);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0;
+            background: rgba(16, 185, 129, 0.1);
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+        }
+    </style>
+
+    <!-- Guru Section -->
+    <section>
+        <div class="premium-hero">
+            <h2>Guru & Staff</h2>
+            <p>Tenaga pendidik dan kependidikan profesional yang berdedikasi untuk mencetak generasi cerdas dan berkarakter unggul.</p>
+        </div>
+
+        <div class="guru-grid">
+            <?php if (empty($daftar_guru)): ?>
+                <div style="text-align:center; padding: 2rem; color: #6b7280; grid-column: 1/-1;">
+                    <p>Belum ada data guru & staff.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($daftar_guru as $gr): ?>
+                    <div class="guru-card">
+                        <img src="<?php echo htmlspecialchars(!empty($gr['foto']) ? $gr['foto'] : 'https://via.placeholder.com/150?text=No+Img'); ?>" 
+                             onerror="this.src='https://via.placeholder.com/150?text=No+Img'" 
+                             alt="<?php echo htmlspecialchars($gr['nama guru']); ?>" 
+                             class="guru-foto">
+                        <h3><?php echo htmlspecialchars($gr['nama guru']); ?></h3>
+                        <p><?php echo htmlspecialchars($gr['mapel guru']); ?></p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 SMP IBNU AQIL. All Rights Reserved.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Membentuk Generasi Cerdas & Berkarakter</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
