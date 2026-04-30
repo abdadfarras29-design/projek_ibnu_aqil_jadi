@@ -669,12 +669,12 @@ if($res_fasilitas_query){
                                 </div>
                                 <div class="form-group">
                                     <label style="font-weight:600;display:block;margin-bottom:.5rem;">Kategori <span style="color:red;">*</span></label>
-                                    <input type="text" name="kategori_berita" id="beritaKategoriNative" class="form-control" required list="listKategoriBeritaNative" placeholder="Ketik kategori..." style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
-                                    <datalist id="listKategoriBeritaNative">
-                                        <option value="pengumuman">
-                                        <option value="prestasi">
-                                        <option value="pilihan utama">
-                                    </datalist>
+                                    <select name="kategori_berita" id="beritaKategoriNative" class="form-control" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;background-color:#fff;cursor:pointer;">
+                                        <option value="" disabled selected>Pilih kategori...</option>
+                                        <option value="prestasi">Prestasi</option>
+                                        <option value="pengumuman">Pengumuman</option>
+                                        <option value="pilihan utama">Pilihan utama</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label style="font-weight:600;display:block;margin-bottom:.5rem;">Tanggal <span style="color:red;">*</span></label>
@@ -1317,7 +1317,14 @@ if($res_fasilitas_query){
                 document.getElementById('beritaIdNative').value = '';
                 document.getElementById('beritaFotoLamaNative').value = '';
                 document.getElementById('beritaJudulNative').value = '';
-                document.getElementById('beritaKategoriNative').value = '';
+                
+                let sel = document.getElementById('beritaKategoriNative');
+                Array.from(sel.options).forEach(opt => {
+                    if(!['', 'prestasi', 'pengumuman', 'pilihan utama'].includes(opt.value)) {
+                        sel.remove(opt.index);
+                    }
+                });
+                sel.value = '';
                 document.getElementById('beritaTanggalNative').value = new Date().toISOString().split('T')[0];
                 document.getElementById('beritaDeskripsiNative').value = '';
                 document.getElementById('infoFotoLamaBerita').innerHTML = '';
@@ -1332,7 +1339,20 @@ if($res_fasilitas_query){
             document.getElementById('beritaIdNative').value = b.id;
             document.getElementById('beritaFotoLamaNative').value = b.foto || '';
             document.getElementById('beritaJudulNative').value = b.judul;
-            document.getElementById('beritaKategoriNative').value = b.kategori || '';
+            
+            // Set category dropdown, try case-insensitive match
+            let kat = (b.kategori || '').toLowerCase();
+            let sel = document.getElementById('beritaKategoriNative');
+            sel.value = kat;
+            // If it doesn't match standard options, you could add it or leave empty
+            if(!sel.value && b.kategori) {
+                let opt = document.createElement('option');
+                opt.value = b.kategori;
+                opt.text = b.kategori;
+                sel.add(opt);
+                sel.value = b.kategori;
+            }
+            
             document.getElementById('beritaTanggalNative').value = b.tanggal;
             document.getElementById('beritaDeskripsiNative').value = b.deskripsi || '';
             

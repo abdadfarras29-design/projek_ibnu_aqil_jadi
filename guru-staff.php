@@ -113,8 +113,8 @@ if ($res_guru) {
 
         .guru-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.5rem;
             padding: 0 2rem;
             max-width: 1250px;
             margin: 0 auto 6rem;
@@ -122,71 +122,55 @@ if ($res_guru) {
 
         .guru-card {
             background: #fff;
-            border-radius: 28px;
-            padding: 2.5rem 2rem;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .guru-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: -1;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: stretch;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
 
         .guru-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 25px 50px rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.2);
-        }
-
-        .guru-card:hover::before {
-            opacity: 1;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
         .guru-foto {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            width: 140px;
+            min-height: 180px;
             object-fit: cover;
-            margin: 0 auto 1.5rem;
-            border: 4px solid var(--light-green);
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
-            transition: transform 0.4s ease;
+            flex-shrink: 0;
+            border-right: 1px solid #e5e7eb;
         }
 
-        .guru-card:hover .guru-foto {
-            transform: scale(1.05);
+        .guru-info {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .guru-card h3 {
-            font-size: 1.3rem;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
         }
 
-        .guru-card p {
-            color: var(--primary-green);
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin: 0;
-            background: rgba(16, 185, 129, 0.1);
-            display: inline-block;
-            padding: 0.4rem 1rem;
-            border-radius: 50px;
+        .info-label {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-align: right;
+            font-weight: 500;
         }
     </style>
 
@@ -194,7 +178,8 @@ if ($res_guru) {
     <section>
         <div class="premium-hero">
             <h2>Guru & Staff</h2>
-            <p>Tenaga pendidik dan kependidikan profesional yang berdedikasi untuk mencetak generasi cerdas dan berkarakter unggul.</p>
+            <p>Tenaga pendidik dan kependidikan profesional yang berdedikasi untuk mencetak generasi cerdas dan
+                berkarakter unggul.</p>
         </div>
 
         <div class="guru-grid">
@@ -205,12 +190,20 @@ if ($res_guru) {
             <?php else: ?>
                 <?php foreach ($daftar_guru as $gr): ?>
                     <div class="guru-card">
-                        <img src="<?php echo htmlspecialchars(!empty($gr['foto']) ? $gr['foto'] : 'https://via.placeholder.com/150?text=No+Img'); ?>" 
-                             onerror="this.src='https://via.placeholder.com/150?text=No+Img'" 
-                             alt="<?php echo htmlspecialchars($gr['nama guru']); ?>" 
-                             class="guru-foto">
-                        <h3><?php echo htmlspecialchars($gr['nama guru']); ?></h3>
-                        <p><?php echo htmlspecialchars($gr['mapel guru']); ?></p>
+                        <img src="<?php echo htmlspecialchars(!empty($gr['foto']) ? $gr['foto'] : 'https://via.placeholder.com/150x200?text=No+Img'); ?>"
+                            onerror="this.src='https://via.placeholder.com/150x200?text=No+Img'"
+                            alt="<?php echo htmlspecialchars($gr['nama guru']); ?>" class="guru-foto">
+                        <div class="guru-info">
+                            <div class="info-row">
+                                <span class="info-label">Nama Lengkap</span>
+                                <span class="info-value"><?php echo htmlspecialchars($gr['nama guru']); ?></span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Jenis GTK</span>
+                                <span class="info-value"><?php echo htmlspecialchars($gr['mapel guru']); ?></span>
+                            </div>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>

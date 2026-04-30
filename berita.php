@@ -1,19 +1,46 @@
 <?php
 require_once 'koneksi.php';
 
-// Ambil berita pilihan utama (featured)
-$q_featured = mysqli_query($KONEKSI, "SELECT * FROM berita WHERE kategori = 'pilihan utama' ORDER BY tanggal DESC, id DESC LIMIT 1");
-$featured = mysqli_fetch_assoc($q_featured);
+$filter_kategori = isset($_GET['kategori']) ? trim($_GET['kategori']) : '';
 
-// Ambil berita lainnya (bukan pilihan utama, atau jika tidak ada pilihan utama, semua berita)
-if ($featured) {
-    $q_news = mysqli_prepare($KONEKSI, "SELECT * FROM berita WHERE id != ? ORDER BY tanggal DESC, id DESC");
-    mysqli_stmt_bind_param($q_news, "i", $featured['id']);
-    mysqli_stmt_execute($q_news);
-    $result_news = mysqli_stmt_get_result($q_news);
+if ($filter_kategori === '') {
+    // Ambil berita pilihan utama (featured)
+    $q_featured = mysqli_query($KONEKSI, "SELECT * FROM berita WHERE kategori = 'pilihan utama' ORDER BY tanggal DESC, id DESC LIMIT 1");
+    $featured = mysqli_fetch_assoc($q_featured);
+
+    // Ambil berita lainnya
+    if ($featured) {
+        $q_news = mysqli_prepare($KONEKSI, "SELECT * FROM berita WHERE id != ? ORDER BY tanggal DESC, id DESC");
+        mysqli_stmt_bind_param($q_news, "i", $featured['id']);
+        mysqli_stmt_execute($q_news);
+        $result_news = mysqli_stmt_get_result($q_news);
+    } else {
+        $result_news = mysqli_query($KONEKSI, "SELECT * FROM berita ORDER BY tanggal DESC, id DESC");
+    }
 } else {
-    // Jika tidak ada pilihan utama, ambil semua berita
-    $result_news = mysqli_query($KONEKSI, "SELECT * FROM berita ORDER BY tanggal DESC, id DESC");
+    // Filter aktif
+    if ($filter_kategori === 'pilihan utama') {
+        $q_featured = mysqli_query($KONEKSI, "SELECT * FROM berita WHERE kategori = 'pilihan utama' ORDER BY tanggal DESC, id DESC LIMIT 1");
+        $featured = mysqli_fetch_assoc($q_featured);
+        
+        if ($featured) {
+            $q_news = mysqli_prepare($KONEKSI, "SELECT * FROM berita WHERE kategori = ? AND id != ? ORDER BY tanggal DESC, id DESC");
+            mysqli_stmt_bind_param($q_news, "si", $filter_kategori, $featured['id']);
+            mysqli_stmt_execute($q_news);
+            $result_news = mysqli_stmt_get_result($q_news);
+        } else {
+            $q_news = mysqli_prepare($KONEKSI, "SELECT * FROM berita WHERE kategori = ? ORDER BY tanggal DESC, id DESC");
+            mysqli_stmt_bind_param($q_news, "s", $filter_kategori);
+            mysqli_stmt_execute($q_news);
+            $result_news = mysqli_stmt_get_result($q_news);
+        }
+    } else {
+        $featured = null; // Jangan tampilkan featured style jika filter selain pilihan utama
+        $q_news = mysqli_prepare($KONEKSI, "SELECT * FROM berita WHERE kategori = ? ORDER BY tanggal DESC, id DESC");
+        mysqli_stmt_bind_param($q_news, "s", $filter_kategori);
+        mysqli_stmt_execute($q_news);
+        $result_news = mysqli_stmt_get_result($q_news);
+    }
 }
 
 $news_list = [];
@@ -272,6 +299,17 @@ $badge_colors = [
     <!-- Header Section -->
     <section class="section active" style="margin-top: 100px;">
         <h2 class="section-title">Berita Terkini</h2>
+        
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
+            <form method="GET" action="berita.php">
+                <select name="kategori" onchange="this.form.submit()" style="padding: 0.6rem 1.2rem; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 1rem; background-color: #fff; cursor: pointer; color: var(--text-dark); min-width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <option value="">Semua Kategori</option>
+                    <option value="prestasi" <?php echo $filter_kategori === 'prestasi' ? 'selected' : ''; ?>>Prestasi</option>
+                    <option value="pengumuman" <?php echo $filter_kategori === 'pengumuman' ? 'selected' : ''; ?>>Pengumuman</option>
+                    <option value="pilihan utama" <?php echo $filter_kategori === 'pilihan utama' ? 'selected' : ''; ?>>Pilihan Utama</option>
+                </select>
+            </form>
+        </div>
 
         <?php if (!$featured && empty($news_list)): ?>
             <!-- Empty state -->
