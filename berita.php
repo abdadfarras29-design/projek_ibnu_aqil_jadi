@@ -22,7 +22,7 @@ if ($filter_kategori === '') {
     if ($filter_kategori === 'pilihan utama') {
         $q_featured = mysqli_query($KONEKSI, "SELECT * FROM berita WHERE kategori = 'pilihan utama' ORDER BY tanggal DESC, id DESC LIMIT 1");
         $featured = mysqli_fetch_assoc($q_featured);
-        
+
         if ($featured) {
             $q_news = mysqli_prepare($KONEKSI, "SELECT * FROM berita WHERE kategori = ? AND id != ? ORDER BY tanggal DESC, id DESC");
             mysqli_stmt_bind_param($q_news, "si", $filter_kategori, $featured['id']);
@@ -48,17 +48,32 @@ while ($row = mysqli_fetch_assoc($result_news)) {
     $news_list[] = $row;
 }
 
-function formatTanggal($tgl) {
-    if (!$tgl) return '';
+function formatTanggal($tgl)
+{
+    if (!$tgl)
+        return '';
     $ts = strtotime($tgl);
-    $bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    return date('d', $ts) . ' ' . $bulan[(int)date('m', $ts)] . ' ' . date('Y', $ts);
+    $bulan = [
+        '',
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+    ];
+    return date('d', $ts) . ' ' . $bulan[(int) date('m', $ts)] . ' ' . date('Y', $ts);
 }
 
 $badge_colors = [
-    'pengumuman'    => ['bg' => '#3b82f6', 'label' => 'PENGUMUMAN'],
-    'prestasi'      => ['bg' => '#f59e0b', 'label' => 'PRESTASI'],
+    'pengumuman' => ['bg' => '#3b82f6', 'label' => 'PENGUMUMAN'],
+    'prestasi' => ['bg' => '#f59e0b', 'label' => 'PRESTASI'],
     'pilihan utama' => ['bg' => '#10b981', 'label' => 'PILIHAN UTAMA'],
 ];
 ?>
@@ -277,15 +292,9 @@ $badge_colors = [
                         <li><a href="galeri.php">Galeri</a></li>
                     </ul>
                 </li>
-                <li class="dropdown">
-                    <a href="#" class="dropbtn">Kontak ▾</a>
-                    <ul class="dropdown-content">
-                        <li><a href="lokasi.php">Lokasi</a></li>
-                        <li><a href="hubungi.php">Hubungi</a></li>
-                        <li><a href="pesan.php">Kirim Pesan</a></li>
-                    </ul>
-                </li>
-                <li><a href="https://s.id/brosur_PPDB_IBNU_AQIL_BOGOR_2024_2025" target="_blank">PPDB</a></li>
+                <li><a href="lokasi.php">Lokasi</a></li>
+                <li><a href="hubungi.php">Hubungi</a></li>
+                <li><a href="ppdb.php" class="nav-ppdb-btn">PPDB</a></li>
                 <li><a href="login.php" class="nav-login-btn">Login</a></li>
             </ul>
             <div class="hamburger" onclick="toggleMenu()">
@@ -299,14 +308,18 @@ $badge_colors = [
     <!-- Header Section -->
     <section class="section active" style="margin-top: 100px;">
         <h2 class="section-title">Berita Terkini</h2>
-        
+
         <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
             <form method="GET" action="berita.php">
-                <select name="kategori" onchange="this.form.submit()" style="padding: 0.6rem 1.2rem; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 1rem; background-color: #fff; cursor: pointer; color: var(--text-dark); min-width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <select name="kategori" onchange="this.form.submit()"
+                    style="padding: 0.6rem 1.2rem; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 1rem; background-color: #fff; cursor: pointer; color: var(--text-dark); min-width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                     <option value="">Semua Kategori</option>
-                    <option value="prestasi" <?php echo $filter_kategori === 'prestasi' ? 'selected' : ''; ?>>Prestasi</option>
-                    <option value="pengumuman" <?php echo $filter_kategori === 'pengumuman' ? 'selected' : ''; ?>>Pengumuman</option>
-                    <option value="pilihan utama" <?php echo $filter_kategori === 'pilihan utama' ? 'selected' : ''; ?>>Pilihan Utama</option>
+                    <option value="prestasi" <?php echo $filter_kategori === 'prestasi' ? 'selected' : ''; ?>>Prestasi
+                    </option>
+                    <option value="pengumuman" <?php echo $filter_kategori === 'pengumuman' ? 'selected' : ''; ?>>
+                        Pengumuman</option>
+                    <option value="pilihan utama" <?php echo $filter_kategori === 'pilihan utama' ? 'selected' : ''; ?>>
+                        Pilihan Utama</option>
                 </select>
             </form>
         </div>
@@ -322,58 +335,57 @@ $badge_colors = [
         <?php else: ?>
 
             <?php if ($featured): ?>
-            <!-- Featured News -->
-            <div class="featured-news">
-                <?php if (!empty($featured['foto'])): ?>
-                    <img src="<?php echo htmlspecialchars($featured['foto']); ?>"
-                         alt="<?php echo htmlspecialchars($featured['judul']); ?>"
-                         class="featured-img"
-                         onerror="this.parentElement.innerHTML='<div class=\'featured-img-placeholder\'>📰</div>'">
-                <?php else: ?>
-                    <div class="featured-img-placeholder">📰</div>
-                <?php endif; ?>
-                <div class="featured-content">
-                    <div class="badge-special">PILIHAN UTAMA</div>
-                    <div class="news-date">📅 <?php echo formatTanggal($featured['tanggal']); ?></div>
-                    <h2><?php echo htmlspecialchars($featured['judul']); ?></h2>
-                    <p><?php echo htmlspecialchars($featured['deskripsi']); ?></p>
-                    <a href="detail-berita.php?id=<?php echo $featured['id']; ?>" class="read-more">Baca Selengkapnya →</a>
+                <!-- Featured News -->
+                <div class="featured-news">
+                    <?php if (!empty($featured['foto'])): ?>
+                        <img src="<?php echo htmlspecialchars($featured['foto']); ?>"
+                            alt="<?php echo htmlspecialchars($featured['judul']); ?>" class="featured-img"
+                            onerror="this.parentElement.innerHTML='<div class=\'featured-img-placeholder\'>📰</div>'">
+                    <?php else: ?>
+                        <div class="featured-img-placeholder">📰</div>
+                    <?php endif; ?>
+                    <div class="featured-content">
+                        <div class="badge-special">PILIHAN UTAMA</div>
+                        <div class="news-date">📅 <?php echo formatTanggal($featured['tanggal']); ?></div>
+                        <h2><?php echo htmlspecialchars($featured['judul']); ?></h2>
+                        <p><?php echo htmlspecialchars($featured['deskripsi']); ?></p>
+                        <a href="detail-berita.php?id=<?php echo $featured['id']; ?>" class="read-more">Baca Selengkapnya →</a>
+                    </div>
                 </div>
-            </div>
             <?php endif; ?>
 
             <?php if (!empty($news_list)): ?>
-            <div class="news-grid">
-                <?php foreach ($news_list as $berita): ?>
-                <?php
-                    $kat   = $berita['kategori'];
-                    $bgKat = $badge_colors[$kat]['bg'] ?? '#6b7280';
-                    $lblKat = $badge_colors[$kat]['label'] ?? strtoupper($kat);
-                ?>
-                <div class="news-card">
-                    <?php if (!empty($berita['foto'])): ?>
-                        <img src="<?php echo htmlspecialchars($berita['foto']); ?>"
-                             alt="<?php echo htmlspecialchars($berita['judul']); ?>"
-                             class="news-image"
-                             onerror="this.parentElement.innerHTML='<div class=\'news-image-placeholder\'>📰</div>'">
-                    <?php else: ?>
-                        <div class="news-image-placeholder">📰</div>
-                    <?php endif; ?>
-                    <div class="news-content">
-                        <span class="news-badge" style="background: <?php echo $bgKat; ?>;"><?php echo $lblKat; ?></span>
-                        <div class="news-date">📅 <?php echo formatTanggal($berita['tanggal']); ?></div>
-                        <h3><?php echo htmlspecialchars($berita['judul']); ?></h3>
-                        <p><?php echo htmlspecialchars($berita['deskripsi']); ?></p>
-                        <a href="detail-berita.php?id=<?php echo $berita['id']; ?>" class="read-more">Baca Selengkapnya →</a>
-                    </div>
+                <div class="news-grid">
+                    <?php foreach ($news_list as $berita): ?>
+                        <?php
+                        $kat = $berita['kategori'];
+                        $bgKat = $badge_colors[$kat]['bg'] ?? '#6b7280';
+                        $lblKat = $badge_colors[$kat]['label'] ?? strtoupper($kat);
+                        ?>
+                        <div class="news-card">
+                            <?php if (!empty($berita['foto'])): ?>
+                                <img src="<?php echo htmlspecialchars($berita['foto']); ?>"
+                                    alt="<?php echo htmlspecialchars($berita['judul']); ?>" class="news-image"
+                                    onerror="this.parentElement.innerHTML='<div class=\'news-image-placeholder\'>📰</div>'">
+                            <?php else: ?>
+                                <div class="news-image-placeholder">📰</div>
+                            <?php endif; ?>
+                            <div class="news-content">
+                                <span class="news-badge" style="background: <?php echo $bgKat; ?>;"><?php echo $lblKat; ?></span>
+                                <div class="news-date">📅 <?php echo formatTanggal($berita['tanggal']); ?></div>
+                                <h3><?php echo htmlspecialchars($berita['judul']); ?></h3>
+                                <p><?php echo htmlspecialchars($berita['deskripsi']); ?></p>
+                                <a href="detail-berita.php?id=<?php echo $berita['id']; ?>" class="read-more">Baca Selengkapnya
+                                    →</a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
-            </div>
             <?php elseif ($featured): ?>
-            <!-- Only featured news, no other news -->
-            <div style="text-align:center; padding:2rem; color:#9ca3af;">
-                <p>Hanya ada satu berita pilihan utama. Berita lainnya akan segera hadir!</p>
-            </div>
+                <!-- Only featured news, no other news -->
+                <div style="text-align:center; padding:2rem; color:#9ca3af;">
+                    <p>Hanya ada satu berita pilihan utama. Berita lainnya akan segera hadir!</p>
+                </div>
             <?php endif; ?>
 
         <?php endif; ?>

@@ -38,15 +38,9 @@
                         <li><a href="galeri.php">Galeri</a></li>
                     </ul>
                 </li>
-                <li class="dropdown">
-                    <a href="#" class="dropbtn">Kontak ▾</a>
-                    <ul class="dropdown-content">
-                        <li><a href="lokasi.php">Lokasi</a></li>
-                        <li><a href="hubungi.php">Hubungi</a></li>
-                        <li><a href="pesan.php">Kirim Pesan</a></li>
-                    </ul>
-                </li>
-                <li><a href="https://s.id/brosur_PPDB_IBNU_AQIL_BOGOR_2024_2025" target="_blank">PPDB</a></li>
+                <li><a href="lokasi.php">Lokasi</a></li>
+                <li><a href="hubungi.php">Hubungi</a></li>
+                <li><a href="ppdb.php" class="nav-ppdb-btn">PPDB</a></li>
                 <li><a href="login.php" class="nav-login-btn">Login</a></li>
             </ul>
             <div class="hamburger" onclick="toggleMenu()">
@@ -112,3 +106,5 @@
 
     <script src="script.js"></script>
 </body>
+
+</html>

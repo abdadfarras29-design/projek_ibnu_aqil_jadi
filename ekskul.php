@@ -48,15 +48,9 @@ if ($res_ekskul) {
                         <li><a href="galeri.php">Galeri</a></li>
                     </ul>
                 </li>
-                <li class="dropdown">
-                    <a href="#" class="dropbtn">Kontak ▾</a>
-                    <ul class="dropdown-content">
-                        <li><a href="lokasi.php">Lokasi</a></li>
-                        <li><a href="hubungi.php">Hubungi</a></li>
-                        <li><a href="pesan.php">Kirim Pesan</a></li>
-                    </ul>
-                </li>
-                <li><a href="https://s.id/brosur_PPDB_IBNU_AQIL_BOGOR_2024_2025" target="_blank">PPDB</a></li>
+                <li><a href="lokasi.php">Lokasi</a></li>
+                <li><a href="hubungi.php">Hubungi</a></li>
+                <li><a href="ppdb.php" class="nav-ppdb-btn">PPDB</a></li>
                 <li><a href="login.php" class="nav-login-btn">Login</a></li>
             </ul>
             <div class="hamburger" onclick="toggleMenu()">
@@ -193,7 +187,8 @@ if ($res_ekskul) {
                 <?php foreach ($daftar_ekskul as $e): ?>
                     <div class="premium-card">
                         <?php if (!empty($e['foto'])): ?>
-                            <img src="<?php echo htmlspecialchars($e['foto']); ?>" alt="<?php echo htmlspecialchars($e['nama']); ?>" style="width:100%;height:220px;object-fit:cover;border-radius:16px;margin-bottom:1.5rem;">
+                            <img src="<?php echo htmlspecialchars($e['foto']); ?>" alt="<?php echo htmlspecialchars($e['nama']); ?>"
+                                style="width:100%;height:220px;object-fit:cover;border-radius:16px;margin-bottom:1.5rem;">
                         <?php endif; ?>
                         <h3><?php echo htmlspecialchars($e['nama']); ?></h3>
                         <p><?php echo nl2br(htmlspecialchars($e['deskripsi'])); ?></p>

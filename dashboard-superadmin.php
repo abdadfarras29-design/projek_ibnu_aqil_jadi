@@ -22,6 +22,53 @@ if (isset($_GET['hapus_pesan']) && is_numeric($_GET['hapus_pesan'])) {
     exit();
 }
 
+// Handle hapus pendaftaran
+if (isset($_GET['hapus_pendaftaran']) && is_numeric($_GET['hapus_pendaftaran'])) {
+    $id_hapus = intval($_GET['hapus_pendaftaran']);
+    $stmt = mysqli_prepare($KONEKSI, "DELETE FROM pendaftaran WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id_hapus);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    header("Location: dashboard-superadmin.php?tab=pendaftaran&notif=hapus_pendaftaran_berhasil");
+    exit();
+}
+
+// Handle Komentar (Approve/Delete)
+if (isset($_GET['approve_komentar']) && is_numeric($_GET['approve_komentar'])) {
+    $id_approve = intval($_GET['approve_komentar']);
+    mysqli_query($KONEKSI, "UPDATE komentar SET status = 'approved' WHERE id = $id_approve");
+    header("Location: dashboard-superadmin.php?tab=komentar&notif=approve_berhasil");
+    exit();
+}
+if (isset($_GET['hapus_komentar']) && is_numeric($_GET['hapus_komentar'])) {
+    $id_hapus = intval($_GET['hapus_komentar']);
+    mysqli_query($KONEKSI, "DELETE FROM komentar WHERE id = $id_hapus");
+    header("Location: dashboard-superadmin.php?tab=komentar&notif=hapus_berhasil");
+    exit();
+}
+
+// Ambil semua komentar
+$result_komentar = mysqli_query($KONEKSI, "SELECT * FROM komentar ORDER BY id DESC");
+$daftar_komentar = [];
+$total_pending_komentar = 0;
+if ($result_komentar) {
+    while ($row = mysqli_fetch_assoc($result_komentar)) {
+        $daftar_komentar[] = $row;
+        if ($row['status'] === 'pending') $total_pending_komentar++;
+    }
+}
+$total_komentar = count($daftar_komentar);
+
+// Ambil semua pendaftaran dari database
+$result_pendaftaran = mysqli_query($KONEKSI, "SELECT * FROM pendaftaran ORDER BY id DESC");
+$daftar_pendaftaran = [];
+if ($result_pendaftaran) {
+    while ($row = mysqli_fetch_assoc($result_pendaftaran)) {
+        $daftar_pendaftaran[] = $row;
+    }
+}
+$total_pendaftaran = count($daftar_pendaftaran);
+
 // Ambil semua pesan dari database
 $result_pesan = mysqli_query($KONEKSI, "SELECT * FROM pesan ORDER BY id DESC");
 $daftar_pesan = [];
@@ -68,7 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_galeri'])) {
     $foto_path = $_POST['foto_lama'] ?? '';
     if (isset($_FILES['foto_galeri']) && $_FILES['foto_galeri']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/galery/';
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        if (!is_dir($uploadDir))
+            mkdir($uploadDir, 0755, true);
         $ext = pathinfo($_FILES['foto_galeri']['name'], PATHINFO_EXTENSION);
         $filename = 'galery_' . time() . '_' . mt_rand(100, 999) . '.' . strtolower($ext);
         $dest = $uploadDir . $filename;
@@ -135,7 +183,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_berita'])) {
 
     if (isset($_FILES['foto_berita']) && $_FILES['foto_berita']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/berita/';
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        if (!is_dir($uploadDir))
+            mkdir($uploadDir, 0755, true);
         $ext = pathinfo($_FILES['foto_berita']['name'], PATHINFO_EXTENSION);
         $filename = 'berita_' . time() . '_' . mt_rand(100, 999) . '.' . strtolower($ext);
         $dest = $uploadDir . $filename;
@@ -173,7 +222,7 @@ while ($row = mysqli_fetch_assoc($res_berita_query)) {
 // NATIVE SERVER CRUD EKSKUL
 if (isset($_GET['hapus_ekskul']) && is_numeric($_GET['hapus_ekskul'])) {
     $id_hapus = intval($_GET['hapus_ekskul']);
-    
+
     $q_foto = mysqli_prepare($KONEKSI, "SELECT foto FROM esktrakulikuler WHERE id = ?");
     mysqli_stmt_bind_param($q_foto, "i", $id_hapus);
     mysqli_stmt_execute($q_foto);
@@ -201,7 +250,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_ekskul'])) {
 
     if (isset($_FILES['foto_ekskul']) && $_FILES['foto_ekskul']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/ekskul/';
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        if (!is_dir($uploadDir))
+            mkdir($uploadDir, 0755, true);
         $ext = pathinfo($_FILES['foto_ekskul']['name'], PATHINFO_EXTENSION);
         $filename = 'ekskul_' . time() . '_' . mt_rand(100, 999) . '.' . strtolower($ext);
         $dest = $uploadDir . $filename;
@@ -299,7 +349,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_guru'])) {
 
     if (isset($_FILES['foto_guru']) && $_FILES['foto_guru']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/guru/';
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        if (!is_dir($uploadDir))
+            mkdir($uploadDir, 0755, true);
         $ext = pathinfo($_FILES['foto_guru']['name'], PATHINFO_EXTENSION);
         $filename = 'guru_' . time() . '_' . mt_rand(100, 999) . '.' . strtolower($ext);
         $dest = $uploadDir . $filename;
@@ -366,7 +417,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_fasilitas'])) 
 
     if (isset($_FILES['foto_fasilitas']) && $_FILES['foto_fasilitas']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/fasilitas/';
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        if (!is_dir($uploadDir))
+            mkdir($uploadDir, 0755, true);
         $ext = pathinfo($_FILES['foto_fasilitas']['name'], PATHINFO_EXTENSION);
         $filename = 'fasilitas_' . time() . '_' . mt_rand(100, 999) . '.' . strtolower($ext);
         $dest = $uploadDir . $filename;
@@ -397,7 +449,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_fasilitas'])) 
 
 $res_fasilitas_query = mysqli_query($KONEKSI, "SELECT * FROM `fasilitas` ORDER BY id DESC");
 $daftar_fasilitas = [];
-if($res_fasilitas_query){
+if ($res_fasilitas_query) {
     while ($row = mysqli_fetch_assoc($res_fasilitas_query)) {
         $daftar_fasilitas[] = $row;
     }
@@ -420,10 +472,12 @@ if($res_fasilitas_query){
     <!-- Navbar Dashboard -->
     <nav class="dashboard-navbar">
         <div class="nav-container">
-            <div class="logo" style="display: flex; align-items: center; gap: 12px; font-weight: bold; color: white; font-size: 1.2rem; letter-spacing: 0.5px;">
+            <div class="logo"
+                style="display: flex; align-items: center; gap: 12px; font-weight: bold; color: white; font-size: 1.2rem; letter-spacing: 0.5px;">
                 <img src="Screenshot_2026-02-22-13-16-05-58_1c337646f29875672b5a61192b9010f9.png" alt="Logo"
                     style="height: 40px; width: auto; object-fit: contain; border-radius: 50%; max-width: 100%;">
-                <span style="border-left: 2px solid rgba(255,255,255,0.3); padding-left: 12px;">HALAMAN ADMIN IBNU AQIL</span>
+                <span style="border-left: 2px solid rgba(255,255,255,0.3); padding-left: 12px;">HALAMAN ADMIN IBNU
+                    AQIL</span>
             </div>
             <div class="user-menu">
                 <span class="user-name" id="userName">
@@ -476,6 +530,19 @@ if($res_fasilitas_query){
                     <i class="icon bx bx-message-square-detail"></i>
                     <span>Pesan Masuk</span>
                 </a>
+                <a href="#" class="menu-item" onclick="showTab('pendaftaran')">
+                    <i class="icon bx bx-user-plus"></i>
+                    <span>Pendaftaran PPDB</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showTab('komentar')">
+                    <i class="icon bx bx-chat"></i>
+                    <span>Kelola Komentar</span>
+                    <?php if ($total_pending_komentar > 0): ?>
+                        <span style="background:#ef4444;color:white;font-size:0.7rem;padding:2px 6px;border-radius:10px;margin-left:auto;">
+                            <?php echo $total_pending_komentar; ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
                 <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e5e7eb;">
                 <a href="index.php" class="menu-item" target="_blank" style="margin-top:auto;">
                     <i class="icon bx bx-window-open"></i>
@@ -483,8 +550,11 @@ if($res_fasilitas_query){
                 </a>
 
                 <div style="margin-top: 2rem; text-align: center; padding: 1rem 1rem 2rem 1rem; perspective: 1000px;">
-                    <img src="Screenshot_2026-02-22-13-16-05-58_1c337646f29875672b5a61192b9010f9.png" alt="Logo SMP Ibnu Aqil" class="logo-interactive" style="cursor: pointer;">
-                    <p style="font-size: 0.8rem; color: #ffffff; opacity: 0.9; margin-top: 0.75rem; font-weight: 700; letter-spacing: 0.05em;">SMP IBNU AQIL</p>
+                    <img src="Screenshot_2026-02-22-13-16-05-58_1c337646f29875672b5a61192b9010f9.png"
+                        alt="Logo SMP Ibnu Aqil" class="logo-interactive" style="cursor: pointer;">
+                    <p
+                        style="font-size: 0.8rem; color: #ffffff; opacity: 0.9; margin-top: 0.75rem; font-weight: 700; letter-spacing: 0.05em;">
+                        SMP IBNU AQIL</p>
                 </div>
             </div>
         </aside>
@@ -493,100 +563,219 @@ if($res_fasilitas_query){
         <main class="dashboard-content">
             <!-- Overview Tab -->
             <div id="overview" class="tab-content active">
-                <div class="page-header" style="background: linear-gradient(135deg, var(--light-gray), #fff); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border-left: 6px solid var(--primary-green); display: flex; align-items: center; justify-content: space-between;">
+                <div class="page-header"
+                    style="background: linear-gradient(135deg, var(--light-gray), #fff); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border-left: 6px solid var(--primary-green); display: flex; align-items: center; justify-content: space-between;">
                     <div>
-                        <h1 style="color: var(--dark-green); margin: 0; font-size: 2.2rem; display: flex; align-items: center; gap: 0.8rem;">
-                            <span style="display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; color: var(--primary-green);">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        <h1
+                            style="color: var(--dark-green); margin: 0; font-size: 2.2rem; display: flex; align-items: center; gap: 0.8rem;">
+                            <span
+                                style="display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; color: var(--primary-green);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
                             </span>
                             Selamat Datang di Panel Admin!
                         </h1>
-                        <p style="color: var(--text-gray); margin-top: 0.5rem; font-size: 1.1rem;">Berikut adalah ringkasan kinerja dan pintasan cepat sistem SMP IBNU AQIL hari ini.</p>
+                        <p style="color: var(--text-gray); margin-top: 0.5rem; font-size: 1.1rem;">Berikut adalah
+                            ringkasan kinerja dan pintasan cepat sistem SMP IBNU AQIL hari ini.</p>
                     </div>
                 </div>
 
                 <!-- Modern Stats Cards -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
-                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)'"
+                        onmouseout="this.style.transform='translateY(0)'">
                         <div>
-                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total Siswa</p>
-                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;"><?php echo htmlspecialchars($statistik_sekolah['siswa']); ?></h3>
+                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total
+                                Siswa</p>
+                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;">
+                                <?php echo htmlspecialchars($statistik_sekolah['siswa']); ?>
+                            </h3>
                         </div>
                         <div style="opacity: 0.8; display: flex; align-items: center;">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        </div>
-                    </div>
-                    
-                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div>
-                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total Guru</p>
-                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;"><?php echo htmlspecialchars($statistik_sekolah['guru']); ?></h3>
-                        </div>
-                        <div style="opacity: 0.8; display: flex; align-items: center;">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
                         </div>
                     </div>
 
-                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)'"
+                        onmouseout="this.style.transform='translateY(0)'">
                         <div>
-                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total Admin</p>
+                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total
+                                Guru</p>
+                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;">
+                                <?php echo htmlspecialchars($statistik_sekolah['guru']); ?>
+                            </h3>
+                        </div>
+                        <div style="opacity: 0.8; display: flex; align-items: center;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)'"
+                        onmouseout="this.style.transform='translateY(0)'">
+                        <div>
+                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total
+                                Admin</p>
                             <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;">1</h3>
                         </div>
                         <div style="opacity: 0.8; display: flex; align-items: center;">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
                         </div>
                     </div>
 
-                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)'"
+                        onmouseout="this.style.transform='translateY(0)'">
                         <div>
-                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total Prestasi</p>
-                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;"><?php echo htmlspecialchars($statistik_sekolah['prestasi']); ?></h3>
+                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total
+                                Prestasi</p>
+                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;">
+                                <?php echo htmlspecialchars($statistik_sekolah['prestasi']); ?>
+                            </h3>
                         </div>
                         <div style="opacity: 0.8; display: flex; align-items: center;">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="7"></circle>
+                                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)'"
+                        onmouseout="this.style.transform='translateY(0)'">
+                        <div>
+                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total
+                                Pendaftaran</p>
+                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;">
+                                <?php echo $total_pendaftaran; ?>
+                            </h3>
+                        </div>
+                        <div style="opacity: 0.8; display: flex; align-items: center;">
+                            <i class='bx bx-user-plus' style="font-size: 48px;"></i>
+                        </div>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); padding: 1.5rem; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3); display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)'"
+                        onmouseout="this.style.transform='translateY(0)'">
+                        <div>
+                            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.2rem; font-weight: 500;">Total
+                                Komentar</p>
+                            <h3 style="font-size: 2.5rem; font-weight: 800; margin: 0; line-height: 1;">
+                                <?php echo $total_komentar; ?>
+                            </h3>
+                        </div>
+                        <div style="opacity: 0.8; display: flex; align-items: center;">
+                            <i class='bx bx-chat' style="font-size: 48px;"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Modern Quick Actions -->
-                <div class="section-card" style="border: none; background: #fff; border-radius: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); padding: 2rem;">
-                    <h2 style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <div class="section-card"
+                    style="border: none; background: #fff; border-radius: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); padding: 2rem;">
+                    <h2
+                        style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                         <span style="color: var(--primary-green); display: flex;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
                         </span>
                         Jalan Pintas
                     </h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-                        <button onclick="showTab('content')" style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;" onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';" onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <button onclick="showTab('content')"
+                            style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';"
+                            onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
                             <span style="display: block; margin-bottom: 1rem; color: var(--primary-green);">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
                             </span>
                             <h3 style="margin: 0; font-size: 1.2rem; color: var(--dark-green);">Edit Konten Website</h3>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Perbarui profil, info dll.</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Perbarui
+                                profil, info dll.</p>
                         </button>
 
-                        <button onclick="showTab('berita')" style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;" onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';" onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
+                        <button onclick="showTab('berita')"
+                            style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';"
+                            onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
                             <span style="display: block; margin-bottom: 1rem; color: var(--primary-green);">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
                             </span>
                             <h3 style="margin: 0; font-size: 1.2rem; color: var(--dark-green);">Kelola Berita</h3>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Tulis artikel terbaru.</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Tulis artikel
+                                terbaru.</p>
                         </button>
 
-                        <button onclick="showTab('galeri')" style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;" onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';" onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
+                        <button onclick="showTab('galeri')"
+                            style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';"
+                            onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
                             <span style="display: block; margin-bottom: 1rem; color: var(--primary-green);">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
                             </span>
                             <h3 style="margin: 0; font-size: 1.2rem; color: var(--dark-green);">Kelola Galeri</h3>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Unggah foto & dokumentasi.</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Unggah foto &
+                                dokumentasi.</p>
                         </button>
 
-                        <button onclick="showTab('messages')" style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;" onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';" onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
+                        <button onclick="showTab('messages')"
+                            style="background: #f8fafc; border: 2px solid transparent; padding: 1.5rem; border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='var(--primary-green)'; this.style.backgroundColor='#f0fdf4';"
+                            onmouseout="this.style.borderColor='transparent'; this.style.backgroundColor='#f8fafc';">
                             <span style="display: block; margin-bottom: 1rem; color: var(--primary-green);">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                    </path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
                             </span>
                             <h3 style="margin: 0; font-size: 1.2rem; color: var(--dark-green);">Lihat Pesan Masuk</h3>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Cek pesan dari pengunjung.</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-gray);">Cek pesan dari
+                                pengunjung.</p>
                         </button>
                     </div>
                 </div>
@@ -645,11 +834,13 @@ if($res_fasilitas_query){
             <div id="berita" class="tab-content">
                 <div class="page-header">
                     <h1> Kelola Berita</h1>
-                    <button class="btn-primary" onclick="bukaFormBeritaNative('tambah')" id="btnTambahBerita">+ Tambah Berita</button>
+                    <button class="btn-primary" onclick="bukaFormBeritaNative('tambah')" id="btnTambahBerita">+ Tambah
+                        Berita</button>
                 </div>
 
                 <?php if (isset($_GET['notif_berita'])): ?>
-                    <div style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
+                    <div
+                        style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
                         <span style="font-size:1.4rem;"></span> Operasi berita berhasil.
                     </div>
                 <?php endif; ?>
@@ -661,15 +852,21 @@ if($res_fasilitas_query){
                             <input type="hidden" name="action_berita" id="beritaActionNative" value="create">
                             <input type="hidden" name="id_berita" id="beritaIdNative" value="">
                             <input type="hidden" name="foto_lama_berita" id="beritaFotoLamaNative" value="">
-                            
+
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Judul Berita <span style="color:red;">*</span></label>
-                                    <input type="text" name="judul_berita" id="beritaJudulNative" class="form-control" placeholder="Judul berita..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Judul Berita <span
+                                            style="color:red;">*</span></label>
+                                    <input type="text" name="judul_berita" id="beritaJudulNative" class="form-control"
+                                        placeholder="Judul berita..." required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Kategori <span style="color:red;">*</span></label>
-                                    <select name="kategori_berita" id="beritaKategoriNative" class="form-control" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;background-color:#fff;cursor:pointer;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Kategori <span
+                                            style="color:red;">*</span></label>
+                                    <select name="kategori_berita" id="beritaKategoriNative" class="form-control"
+                                        required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;background-color:#fff;cursor:pointer;">
                                         <option value="" disabled selected>Pilih kategori...</option>
                                         <option value="prestasi">Prestasi</option>
                                         <option value="pengumuman">Pengumuman</option>
@@ -677,22 +874,32 @@ if($res_fasilitas_query){
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Tanggal <span style="color:red;">*</span></label>
-                                    <input type="date" name="tanggal_berita" id="beritaTanggalNative" class="form-control" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Tanggal <span
+                                            style="color:red;">*</span></label>
+                                    <input type="date" name="tanggal_berita" id="beritaTanggalNative"
+                                        class="form-control" required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload Foto</label>
-                                    <input type="file" name="foto_berita" id="beritaFotoNative" accept="image/*" style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
-                                    <small style="display:block;margin-top:.5rem;color:#6b7280;" id="infoFotoLamaBerita"></small>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload
+                                        Foto</label>
+                                    <input type="file" name="foto_berita" id="beritaFotoNative" accept="image/*"
+                                        style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
+                                    <small style="display:block;margin-top:.5rem;color:#6b7280;"
+                                        id="infoFotoLamaBerita"></small>
                                 </div>
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi Berita <span style="color:red;">*</span></label>
-                                    <textarea name="deskripsi_berita" id="beritaDeskripsiNative" class="form-control" rows="5" placeholder="Isi berita..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;resize:vertical;"></textarea>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi Berita
+                                        <span style="color:red;">*</span></label>
+                                    <textarea name="deskripsi_berita" id="beritaDeskripsiNative" class="form-control"
+                                        rows="5" placeholder="Isi berita..." required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;resize:vertical;"></textarea>
                                 </div>
                             </div>
                             <div style="display:flex;gap:1rem;margin-top:1.5rem;">
                                 <button type="submit" class="btn-primary"> Simpan Berita</button>
-                                <button type="button" class="btn-secondary" onclick="document.getElementById('formBeritaWrapNative').style.display='none'">Batal</button>
+                                <button type="button" class="btn-secondary"
+                                    onclick="document.getElementById('formBeritaWrapNative').style.display='none'">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -715,34 +922,51 @@ if($res_fasilitas_query){
                             </thead>
                             <tbody>
                                 <?php if (empty($daftar_berita_native)): ?>
-                                    <tr><td colspan="7" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada berita.</td></tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada
+                                            berita.</td>
+                                    </tr>
                                 <?php else: ?>
-                                    <?php $no=1; foreach($daftar_berita_native as $b): ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_berita_native as $b): ?>
                                         <tr>
                                             <td><?php echo $no++; ?></td>
                                             <td>
-                                                <img src="<?php echo htmlspecialchars(!empty($b['foto']) ? $b['foto'] : 'https://via.placeholder.com/60x40?text=No+Img'); ?>" onerror="this.src='https://via.placeholder.com/60x40?text=No+Img'" style="width:60px;height:40px;object-fit:cover;border-radius:6px;cursor:pointer;" onclick="previewModalBeritaNative(<?php echo htmlspecialchars(json_encode($b)); ?>)">
+                                                <img src="<?php echo htmlspecialchars(!empty($b['foto']) ? $b['foto'] : 'https://via.placeholder.com/60x40?text=No+Img'); ?>"
+                                                    onerror="this.src='https://via.placeholder.com/60x40?text=No+Img'"
+                                                    style="width:60px;height:40px;object-fit:cover;border-radius:6px;cursor:pointer;"
+                                                    onclick="previewModalBeritaNative(<?php echo htmlspecialchars(json_encode($b)); ?>)">
                                             </td>
                                             <td><strong><?php echo htmlspecialchars($b['judul']); ?></strong></td>
                                             <td>
-                                                <?php 
-                                                    $kat = strtolower($b['kategori']);
-                                                    $bg = '#6b7280';
-                                                    if($kat === 'pengumuman') $bg = '#3b82f6';
-                                                    elseif($kat === 'prestasi') $bg = '#f59e0b';
-                                                    elseif($kat === 'pilihan utama') $bg = '#10b981';
+                                                <?php
+                                                $kat = strtolower($b['kategori']);
+                                                $bg = '#6b7280';
+                                                if ($kat === 'pengumuman')
+                                                    $bg = '#3b82f6';
+                                                elseif ($kat === 'prestasi')
+                                                    $bg = '#f59e0b';
+                                                elseif ($kat === 'pilihan utama')
+                                                    $bg = '#10b981';
                                                 ?>
-                                                <span style="background:<?php echo $bg; ?>;color:#fff;padding:.2rem .6rem;border-radius:50px;font-size:.75rem;font-weight:700;">
+                                                <span
+                                                    style="background:<?php echo $bg; ?>;color:#fff;padding:.2rem .6rem;border-radius:50px;font-size:.75rem;font-weight:700;">
                                                     <?php echo htmlspecialchars($b['kategori']); ?>
                                                 </span>
                                             </td>
                                             <td><?php echo date('d M Y', strtotime($b['tanggal'])); ?></td>
-                                            <td style="max-width:200px;"><?php echo htmlspecialchars(mb_strimwidth($b['deskripsi'] ?? '', 0, 60, '...')); ?></td>
+                                            <td style="max-width:200px;">
+                                                <?php echo htmlspecialchars(mb_strimwidth($b['deskripsi'] ?? '', 0, 60, '...')); ?>
+                                            </td>
                                             <td>
                                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                                    <button class="btn-small btn-view" onclick="previewModalBeritaNative(<?php echo htmlspecialchars(json_encode($b)); ?>)">Lihat</button>
-                                                    <button class="btn-small btn-edit" onclick="editBeritaNative(<?php echo htmlspecialchars(json_encode($b)); ?>)">Edit</button>
-                                                    <a href="dashboard-superadmin.php?hapus_berita=<?php echo $b['id']; ?>" class="btn-small btn-delete" onclick="confirmHapus(event, 'Hapus Berita', 'Yakin ingin menghapus berita \'<?php echo addslashes($b['judul']); ?>\'?')">Hapus</a>
+                                                    <button class="btn-small btn-view"
+                                                        onclick="previewModalBeritaNative(<?php echo htmlspecialchars(json_encode($b)); ?>)">Lihat</button>
+                                                    <button class="btn-small btn-edit"
+                                                        onclick="editBeritaNative(<?php echo htmlspecialchars(json_encode($b)); ?>)">Edit</button>
+                                                    <a href="dashboard-superadmin.php?hapus_berita=<?php echo $b['id']; ?>"
+                                                        class="btn-small btn-delete"
+                                                        onclick="confirmHapus(event, 'Hapus Berita', 'Yakin ingin menghapus berita \'<?php echo addslashes($b['judul']); ?>\'?')">Hapus</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -754,27 +978,36 @@ if($res_fasilitas_query){
                 </div>
 
                 <!-- Modal Detail Berita Native -->
-                <div id="modalDetailBeritaNative" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">
-                    <div style="background:#fff;margin:5% auto;border-radius:20px;width:90%;max-width:680px;box-shadow:0 25px 60px rgba(0,0,0,0.35);overflow:hidden;position:relative;animation:fadeInModal .25s ease;">
-                        <img id="modalBeritaFotoNative" src="" alt="Foto" style="width:100%;height:260px;object-fit:cover;display:block;">
-                        <span onclick="document.getElementById('modalDetailBeritaNative').style.display='none'" style="position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;">&times;</span>
+                <div id="modalDetailBeritaNative"
+                    style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">
+                    <div
+                        style="background:#fff;margin:5% auto;border-radius:20px;width:90%;max-width:680px;box-shadow:0 25px 60px rgba(0,0,0,0.35);overflow:hidden;position:relative;animation:fadeInModal .25s ease;">
+                        <img id="modalBeritaFotoNative" src="" alt="Foto"
+                            style="width:100%;height:260px;object-fit:cover;display:block;">
+                        <span onclick="document.getElementById('modalDetailBeritaNative').style.display='none'"
+                            style="position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;">&times;</span>
                         <div style="padding:2rem;">
-                            <div style="font-size:.85rem;color:#10b981;font-weight:600;margin-bottom:.5rem;"> <span id="modalBeritaTanggalNative"></span></div>
-                            <h2 id="modalBeritaJudulNative" style="font-size:1.4rem;color:#1f2937;margin-bottom:1rem;line-height:1.4;"></h2>
-                            <p id="modalBeritaDeskripsiNative" style="color:#4b5563;line-height:1.7;white-space:pre-wrap;"></p>
+                            <div style="font-size:.85rem;color:#10b981;font-weight:600;margin-bottom:.5rem;"> <span
+                                    id="modalBeritaTanggalNative"></span></div>
+                            <h2 id="modalBeritaJudulNative"
+                                style="font-size:1.4rem;color:#1f2937;margin-bottom:1rem;line-height:1.4;"></h2>
+                            <p id="modalBeritaDeskripsiNative"
+                                style="color:#4b5563;line-height:1.7;white-space:pre-wrap;"></p>
                         </div>
                     </div>
                 </div>
             </div>
-<!-- ===================== KELOLA GALERI TAB ===================== -->
+            <!-- ===================== KELOLA GALERI TAB ===================== -->
             <div id="galeri" class="tab-content">
                 <div class="page-header">
                     <h1> Kelola Galeri</h1>
-                    <button class="btn-primary" onclick="bukaFormGaleriNative('tambah')" id="btnTambahGaleri">+ Tambah Foto</button>
+                    <button class="btn-primary" onclick="bukaFormGaleriNative('tambah')" id="btnTambahGaleri">+ Tambah
+                        Foto</button>
                 </div>
 
                 <?php if (isset($_GET['notif_galeri'])): ?>
-                    <div style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
+                    <div
+                        style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
                         <span style="font-size:1.4rem;"></span> Operasi galeri berhasil.
                     </div>
                 <?php endif; ?>
@@ -786,29 +1019,42 @@ if($res_fasilitas_query){
                             <input type="hidden" name="action_galeri" id="galeriActionNative" value="create">
                             <input type="hidden" name="id_galeri" id="galeriIdNative" value="">
                             <input type="hidden" name="foto_lama" id="galeriFotoLamaNative" value="">
-                            
+
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Judul <span style="color:red;">*</span></label>
-                                    <input type="text" name="judul_galeri" id="galeriJudulNative" class="form-control" placeholder="Judul foto/kegiatan..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Judul <span
+                                            style="color:red;">*</span></label>
+                                    <input type="text" name="judul_galeri" id="galeriJudulNative" class="form-control"
+                                        placeholder="Judul foto/kegiatan..." required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload Foto</label>
-                                    <input type="file" name="foto_galeri" id="galeriFotoNative" accept="image/*" style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
-                                    <small style="display:block;margin-top:.5rem;color:#6b7280;" id="infoFotoLama"></small>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload
+                                        Foto</label>
+                                    <input type="file" name="foto_galeri" id="galeriFotoNative" accept="image/*"
+                                        style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
+                                    <small style="display:block;margin-top:.5rem;color:#6b7280;"
+                                        id="infoFotoLama"></small>
                                 </div>
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Kategori <small style="color:#6b7280;">(Opsional)</small></label>
-                                    <input type="text" name="kategori_galeri" id="galeriKeteranganNative" class="form-control" placeholder="Kegiatan, Ekstrakurikuler, Fasilitas, dll." style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Kategori <small
+                                            style="color:#6b7280;">(Opsional)</small></label>
+                                    <input type="text" name="kategori_galeri" id="galeriKeteranganNative"
+                                        class="form-control" placeholder="Kegiatan, Ekstrakurikuler, Fasilitas, dll."
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi Detail <small style="color:#6b7280;">(Opsional)</small></label>
-                                    <textarea name="deskripsi_galeri" id="galeriDeskripsiNative" class="form-control" rows="3" placeholder="Deskripsi foto..." style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;resize:vertical;"></textarea>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi Detail
+                                        <small style="color:#6b7280;">(Opsional)</small></label>
+                                    <textarea name="deskripsi_galeri" id="galeriDeskripsiNative" class="form-control"
+                                        rows="3" placeholder="Deskripsi foto..."
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;resize:vertical;"></textarea>
                                 </div>
                             </div>
                             <div style="display:flex;gap:1rem;margin-top:1.5rem;">
                                 <button type="submit" class="btn-primary"> Simpan Foto</button>
-                                <button type="button" class="btn-secondary" onclick="document.getElementById('formGaleriWrapNative').style.display='none'">Batal</button>
+                                <button type="button" class="btn-secondary"
+                                    onclick="document.getElementById('formGaleriWrapNative').style.display='none'">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -830,22 +1076,35 @@ if($res_fasilitas_query){
                             </thead>
                             <tbody>
                                 <?php if (empty($daftar_galeri)): ?>
-                                    <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada foto di galeri.</td></tr>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada
+                                            foto di galeri.</td>
+                                    </tr>
                                 <?php else: ?>
-                                    <?php $no=1; foreach($daftar_galeri as $g): ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_galeri as $g): ?>
                                         <tr>
                                             <td><?php echo $no++; ?></td>
                                             <td>
-                                                <img src="<?php echo htmlspecialchars(!empty($g['foto']) ? $g['foto'] : 'https://via.placeholder.com/60x40?text=No+Img'); ?>" onerror="this.src='https://via.placeholder.com/60x40?text=No+Img'" style="width:60px;height:40px;object-fit:cover;border-radius:6px;cursor:pointer;" onclick="previewModalGaleriNative(<?php echo htmlspecialchars(json_encode($g)); ?>)">
+                                                <img src="<?php echo htmlspecialchars(!empty($g['foto']) ? $g['foto'] : 'https://via.placeholder.com/60x40?text=No+Img'); ?>"
+                                                    onerror="this.src='https://via.placeholder.com/60x40?text=No+Img'"
+                                                    style="width:60px;height:40px;object-fit:cover;border-radius:6px;cursor:pointer;"
+                                                    onclick="previewModalGaleriNative(<?php echo htmlspecialchars(json_encode($g)); ?>)">
                                             </td>
                                             <td><strong><?php echo htmlspecialchars($g['judul']); ?></strong></td>
                                             <td><?php echo htmlspecialchars($g['kategori'] ?? '—'); ?></td>
-                                            <td style="max-width:200px;"><?php echo htmlspecialchars(mb_strimwidth($g['deskripsi'] ?? '', 0, 50, '...')); ?></td>
+                                            <td style="max-width:200px;">
+                                                <?php echo htmlspecialchars(mb_strimwidth($g['deskripsi'] ?? '', 0, 50, '...')); ?>
+                                            </td>
                                             <td>
                                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                                    <button class="btn-small btn-view" onclick="previewModalGaleriNative(<?php echo htmlspecialchars(json_encode($g)); ?>)">Lihat</button>
-                                                    <button class="btn-small btn-edit" onclick="editGaleriNative(<?php echo htmlspecialchars(json_encode($g)); ?>)">Edit</button>
-                                                    <a href="dashboard-superadmin.php?hapus_galeri=<?php echo $g['id']; ?>" class="btn-small btn-delete" onclick="confirmHapus(event, 'Hapus Foto', 'Yakin ingin menghapus foto \'<?php echo addslashes($g['judul']); ?>\'?')">Hapus</a>
+                                                    <button class="btn-small btn-view"
+                                                        onclick="previewModalGaleriNative(<?php echo htmlspecialchars(json_encode($g)); ?>)">Lihat</button>
+                                                    <button class="btn-small btn-edit"
+                                                        onclick="editGaleriNative(<?php echo htmlspecialchars(json_encode($g)); ?>)">Edit</button>
+                                                    <a href="dashboard-superadmin.php?hapus_galeri=<?php echo $g['id']; ?>"
+                                                        class="btn-small btn-delete"
+                                                        onclick="confirmHapus(event, 'Hapus Foto', 'Yakin ingin menghapus foto \'<?php echo addslashes($g['judul']); ?>\'?')">Hapus</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -857,13 +1116,19 @@ if($res_fasilitas_query){
                 </div>
 
                 <!-- Modal Detail Galeri Native -->
-                <div id="modalDetailGaleriNative" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);">
-                    <div style="background:#fff;margin:5% auto;border-radius:12px;width:90%;max-width:800px;box-shadow:0 25px 60px rgba(0,0,0,0.5);overflow:hidden;position:relative;animation:fadeInModal .25s ease;">
-                        <span onclick="document.getElementById('modalDetailGaleriNative').style.display='none'" style="position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;z-index:2;">&times;</span>
-                        <img id="modalGaleriFotoNative" src="" alt="Foto" style="width:100%;max-height:500px;object-fit:contain;background:#111;display:block;">
+                <div id="modalDetailGaleriNative"
+                    style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);">
+                    <div
+                        style="background:#fff;margin:5% auto;border-radius:12px;width:90%;max-width:800px;box-shadow:0 25px 60px rgba(0,0,0,0.5);overflow:hidden;position:relative;animation:fadeInModal .25s ease;">
+                        <span onclick="document.getElementById('modalDetailGaleriNative').style.display='none'"
+                            style="position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;z-index:2;">&times;</span>
+                        <img id="modalGaleriFotoNative" src="" alt="Foto"
+                            style="width:100%;max-height:500px;object-fit:contain;background:#111;display:block;">
                         <div style="padding:1.5rem 2rem;">
-                            <h2 id="modalGaleriJudulNative" style="font-size:1.5rem;color:#1f2937;margin-bottom:.5rem;"></h2>
-                            <p id="modalGaleriKeteranganNative" style="font-size:.9rem;color:#6b7280;font-weight:600;margin-bottom:1rem;"></p>
+                            <h2 id="modalGaleriJudulNative" style="font-size:1.5rem;color:#1f2937;margin-bottom:.5rem;">
+                            </h2>
+                            <p id="modalGaleriKeteranganNative"
+                                style="font-size:.9rem;color:#6b7280;font-weight:600;margin-bottom:1rem;"></p>
                             <p id="modalGaleriDeskripsiNative" style="color:#4b5563;line-height:1.6;"></p>
                         </div>
                     </div>
@@ -874,11 +1139,13 @@ if($res_fasilitas_query){
             <div id="ekskul" class="tab-content">
                 <div class="page-header">
                     <h1> Kelola Ekstrakurikuler</h1>
-                    <button class="btn-primary" onclick="bukaFormEkskulNative('tambah')" id="btnTambahEkskul">+ Tambah Ekskul</button>
+                    <button class="btn-primary" onclick="bukaFormEkskulNative('tambah')" id="btnTambahEkskul">+ Tambah
+                        Ekskul</button>
                 </div>
 
                 <?php if (isset($_GET['notif_ekskul'])): ?>
-                    <div style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
+                    <div
+                        style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
                         <span style="font-size:1.4rem;"></span> Operasi ekstrakurikuler berhasil.
                     </div>
                 <?php endif; ?>
@@ -890,26 +1157,36 @@ if($res_fasilitas_query){
                             <input type="hidden" name="action_ekskul" id="ekskulActionNative" value="create">
                             <input type="hidden" name="id_ekskul" id="ekskulIdNative" value="">
                             <input type="hidden" name="foto_lama_ekskul" id="ekskulFotoLamaNative" value="">
-                            
+
                             <div style="display:grid;grid-template-columns:1fr;gap:1.5rem;">
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Nama Ekskul <span style="color:red;">*</span></label>
-                                    <input type="text" name="nama_ekskul" id="ekskulNamaNative" class="form-control" placeholder="Nama ekstrakurikuler..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Nama Ekskul <span
+                                            style="color:red;">*</span></label>
+                                    <input type="text" name="nama_ekskul" id="ekskulNamaNative" class="form-control"
+                                        placeholder="Nama ekstrakurikuler..." required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
 
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi <span style="color:red;">*</span></label>
-                                    <textarea name="deskripsi_ekskul" id="ekskulDeskripsiNative" class="form-control" rows="4" placeholder="Deskripsi ekskul..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;resize:vertical;"></textarea>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi <span
+                                            style="color:red;">*</span></label>
+                                    <textarea name="deskripsi_ekskul" id="ekskulDeskripsiNative" class="form-control"
+                                        rows="4" placeholder="Deskripsi ekskul..." required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;resize:vertical;"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload Foto</label>
-                                    <input type="file" name="foto_ekskul" id="ekskulFotoNative" accept="image/*" style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
-                                    <small style="display:block;margin-top:.5rem;color:#6b7280;" id="infoFotoLamaEkskul"></small>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload
+                                        Foto</label>
+                                    <input type="file" name="foto_ekskul" id="ekskulFotoNative" accept="image/*"
+                                        style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
+                                    <small style="display:block;margin-top:.5rem;color:#6b7280;"
+                                        id="infoFotoLamaEkskul"></small>
                                 </div>
                             </div>
                             <div style="display:flex;gap:1rem;margin-top:1.5rem;">
                                 <button type="submit" class="btn-primary"> Simpan Ekskul</button>
-                                <button type="button" class="btn-secondary" onclick="document.getElementById('formEkskulWrapNative').style.display='none'">Batal</button>
+                                <button type="button" class="btn-secondary"
+                                    onclick="document.getElementById('formEkskulWrapNative').style.display='none'">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -930,20 +1207,31 @@ if($res_fasilitas_query){
                             </thead>
                             <tbody>
                                 <?php if (empty($daftar_ekskul)): ?>
-                                    <tr><td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada ekskul.</td></tr>
+                                    <tr>
+                                        <td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada
+                                            ekskul.</td>
+                                    </tr>
                                 <?php else: ?>
-                                    <?php $no=1; foreach($daftar_ekskul as $e): ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_ekskul as $e): ?>
                                         <tr>
                                             <td><?php echo $no++; ?></td>
                                             <td>
-                                                <img src="<?php echo htmlspecialchars(!empty($e['foto']) ? $e['foto'] : 'https://via.placeholder.com/80x50?text=No+Img'); ?>" onerror="this.src='https://via.placeholder.com/80x50?text=No+Img'" style="width:80px;height:50px;object-fit:cover;border-radius:8px;">
+                                                <img src="<?php echo htmlspecialchars(!empty($e['foto']) ? $e['foto'] : 'https://via.placeholder.com/80x50?text=No+Img'); ?>"
+                                                    onerror="this.src='https://via.placeholder.com/80x50?text=No+Img'"
+                                                    style="width:80px;height:50px;object-fit:cover;border-radius:8px;">
                                             </td>
                                             <td><strong><?php echo htmlspecialchars($e['nama']); ?></strong></td>
-                                            <td style="max-width:300px;"><?php echo htmlspecialchars(mb_strimwidth($e['deskripsi'] ?? '', 0, 80, '...')); ?></td>
+                                            <td style="max-width:300px;">
+                                                <?php echo htmlspecialchars(mb_strimwidth($e['deskripsi'] ?? '', 0, 80, '...')); ?>
+                                            </td>
                                             <td>
                                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                                    <button class="btn-small btn-edit" onclick='editEkskulNative(<?php echo htmlspecialchars(json_encode($e), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
-                                                    <a href="dashboard-superadmin.php?hapus_ekskul=<?php echo $e['id']; ?>" class="btn-small btn-delete" onclick="confirmHapus(event, 'Hapus Ekskul', 'Yakin ingin menghapus ekskul \'<?php echo addslashes($e['nama']); ?>\'?')">Hapus</a>
+                                                    <button class="btn-small btn-edit"
+                                                        onclick='editEkskulNative(<?php echo htmlspecialchars(json_encode($e), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
+                                                    <a href="dashboard-superadmin.php?hapus_ekskul=<?php echo $e['id']; ?>"
+                                                        class="btn-small btn-delete"
+                                                        onclick="confirmHapus(event, 'Hapus Ekskul', 'Yakin ingin menghapus ekskul \'<?php echo addslashes($e['nama']); ?>\'?')">Hapus</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -963,7 +1251,8 @@ if($res_fasilitas_query){
                 </div>
 
                 <?php if (isset($_GET['notif_statistik']) && $_GET['notif_statistik'] === 'berhasil'): ?>
-                    <div style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
+                    <div
+                        style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
                         <span style="font-size:1.4rem;"></span> Statistik sekolah berhasil diperbarui.
                     </div>
                 <?php endif; ?>
@@ -971,23 +1260,36 @@ if($res_fasilitas_query){
                 <div class="section-card" style="border-left:4px solid #10b981;">
                     <form action="dashboard-superadmin.php" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="action_statistik" value="update">
-                        
+
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
                             <div class="form-group">
-                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Siswa Aktif <span style="color:red;">*</span></label>
-                                <input type="text" name="siswa" class="form-control" value="<?php echo htmlspecialchars($statistik_sekolah['siswa']); ?>" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Siswa Aktif <span
+                                        style="color:red;">*</span></label>
+                                <input type="text" name="siswa" class="form-control"
+                                    value="<?php echo htmlspecialchars($statistik_sekolah['siswa']); ?>" required
+                                    style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                             </div>
                             <div class="form-group">
-                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Guru Berkualitas <span style="color:red;">*</span></label>
-                                <input type="text" name="guru" class="form-control" value="<?php echo htmlspecialchars($statistik_sekolah['guru']); ?>" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Guru Berkualitas <span
+                                        style="color:red;">*</span></label>
+                                <input type="text" name="guru" class="form-control"
+                                    value="<?php echo htmlspecialchars($statistik_sekolah['guru']); ?>" required
+                                    style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                             </div>
                             <div class="form-group">
-                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Prestasi <span style="color:red;">*</span></label>
-                                <input type="text" name="prestasi" class="form-control" value="<?php echo htmlspecialchars($statistik_sekolah['prestasi']); ?>" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Prestasi <span
+                                        style="color:red;">*</span></label>
+                                <input type="text" name="prestasi" class="form-control"
+                                    value="<?php echo htmlspecialchars($statistik_sekolah['prestasi']); ?>" required
+                                    style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                             </div>
                             <div class="form-group">
-                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Rombongan Belajar <span style="color:red;">*</span></label>
-                                <input type="text" name="rombongan_belajar" class="form-control" value="<?php echo htmlspecialchars($statistik_sekolah['rombongan belajar'] ?? ''); ?>" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                <label style="font-weight:600;display:block;margin-bottom:.5rem;">Rombongan Belajar
+                                    <span style="color:red;">*</span></label>
+                                <input type="text" name="rombongan_belajar" class="form-control"
+                                    value="<?php echo htmlspecialchars($statistik_sekolah['rombongan belajar'] ?? ''); ?>"
+                                    required
+                                    style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                             </div>
                         </div>
                         <div style="margin-top:1.5rem;">
@@ -1001,11 +1303,13 @@ if($res_fasilitas_query){
             <div id="fasilitas" class="tab-content">
                 <div class="page-header">
                     <h1> Kelola Fasilitas</h1>
-                    <button class="btn-primary" onclick="bukaFormFasilitasNative('tambah')" id="btnTambahFasilitas">+ Tambah Fasilitas</button>
+                    <button class="btn-primary" onclick="bukaFormFasilitasNative('tambah')" id="btnTambahFasilitas">+
+                        Tambah Fasilitas</button>
                 </div>
 
                 <?php if (isset($_GET['notif_fasilitas'])): ?>
-                    <div style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
+                    <div
+                        style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
                         <span style="font-size:1.4rem;"></span> Operasi Fasilitas berhasil.
                     </div>
                 <?php endif; ?>
@@ -1017,25 +1321,36 @@ if($res_fasilitas_query){
                             <input type="hidden" name="action_fasilitas" id="fasilitasActionNative" value="create">
                             <input type="hidden" name="id_fasilitas" id="fasilitasIdNative" value="">
                             <input type="hidden" name="foto_lama_fasilitas" id="fasilitasFotoLamaNative" value="">
-                            
+
                             <div style="display:grid;grid-template-columns:1fr;gap:1.5rem;">
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Nama Fasilitas <span style="color:red;">*</span></label>
-                                    <input type="text" name="nama_fasilitas" id="fasilitasNamaNative" class="form-control" placeholder="Contoh: Ruang Kelas Modern" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Nama Fasilitas
+                                        <span style="color:red;">*</span></label>
+                                    <input type="text" name="nama_fasilitas" id="fasilitasNamaNative"
+                                        class="form-control" placeholder="Contoh: Ruang Kelas Modern" required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi <span style="color:red;">*</span></label>
-                                    <textarea name="deskripsi_fasilitas" id="fasilitasDeskripsiNative" class="form-control" rows="4" placeholder="Deskripsi mengenai fasilitas..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;"></textarea>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Deskripsi <span
+                                            style="color:red;">*</span></label>
+                                    <textarea name="deskripsi_fasilitas" id="fasilitasDeskripsiNative"
+                                        class="form-control" rows="4" placeholder="Deskripsi mengenai fasilitas..."
+                                        required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload Foto</label>
-                                    <input type="file" name="foto_fasilitas" id="fasilitasFotoNative" accept="image/*" style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
-                                    <small style="display:block;margin-top:.5rem;color:#6b7280;" id="infoFotoLamaFasilitas"></small>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload
+                                        Foto</label>
+                                    <input type="file" name="foto_fasilitas" id="fasilitasFotoNative" accept="image/*"
+                                        style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
+                                    <small style="display:block;margin-top:.5rem;color:#6b7280;"
+                                        id="infoFotoLamaFasilitas"></small>
                                 </div>
                             </div>
                             <div style="display:flex;gap:1rem;margin-top:1.5rem;">
                                 <button type="submit" class="btn-primary"> Simpan Data</button>
-                                <button type="button" class="btn-secondary" onclick="document.getElementById('formFasilitasWrapNative').style.display='none'">Batal</button>
+                                <button type="button" class="btn-secondary"
+                                    onclick="document.getElementById('formFasilitasWrapNative').style.display='none'">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -1056,20 +1371,29 @@ if($res_fasilitas_query){
                             </thead>
                             <tbody>
                                 <?php if (empty($daftar_fasilitas)): ?>
-                                    <tr><td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada data fasilitas.</td></tr>
+                                    <tr>
+                                        <td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada
+                                            data fasilitas.</td>
+                                    </tr>
                                 <?php else: ?>
-                                    <?php $no=1; foreach($daftar_fasilitas as $fas): ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_fasilitas as $fas): ?>
                                         <tr>
                                             <td><?php echo $no++; ?></td>
                                             <td>
-                                                <img src="<?php echo htmlspecialchars(!empty($fas['foto']) ? $fas['foto'] : 'https://via.placeholder.com/80x50?text=No+Img'); ?>" onerror="this.src='https://via.placeholder.com/80x50?text=No+Img'" style="width:80px;height:50px;object-fit:cover;border-radius:8px;">
+                                                <img src="<?php echo htmlspecialchars(!empty($fas['foto']) ? $fas['foto'] : 'https://via.placeholder.com/80x50?text=No+Img'); ?>"
+                                                    onerror="this.src='https://via.placeholder.com/80x50?text=No+Img'"
+                                                    style="width:80px;height:50px;object-fit:cover;border-radius:8px;">
                                             </td>
                                             <td><strong><?php echo htmlspecialchars($fas['nama fasilitas']); ?></strong></td>
                                             <td><?php echo nl2br(htmlspecialchars($fas['deskripsi'])); ?></td>
                                             <td>
                                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                                    <button class="btn-small btn-edit" onclick='editFasilitasNative(<?php echo htmlspecialchars(json_encode($fas), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
-                                                    <a href="dashboard-superadmin.php?hapus_fasilitas=<?php echo $fas['id']; ?>" class="btn-small btn-delete" onclick="confirmHapus(event, 'Hapus Fasilitas', 'Yakin ingin menghapus '<?php echo addslashes($fas['nama fasilitas']); ?>'?')">Hapus</a>
+                                                    <button class="btn-small btn-edit"
+                                                        onclick='editFasilitasNative(<?php echo htmlspecialchars(json_encode($fas), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
+                                                    <a href="dashboard-superadmin.php?hapus_fasilitas=<?php echo $fas['id']; ?>"
+                                                        class="btn-small btn-delete"
+                                                        onclick="confirmHapus(event, 'Hapus Fasilitas', 'Yakin ingin menghapus '<?php echo addslashes($fas['nama fasilitas']); ?>'?')">Hapus</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1085,11 +1409,13 @@ if($res_fasilitas_query){
             <div id="guru" class="tab-content">
                 <div class="page-header">
                     <h1> Kelola Guru & Staff</h1>
-                    <button class="btn-primary" onclick="bukaFormGuruNative('tambah')" id="btnTambahGuru">+ Tambah Guru</button>
+                    <button class="btn-primary" onclick="bukaFormGuruNative('tambah')" id="btnTambahGuru">+ Tambah
+                        Guru</button>
                 </div>
 
                 <?php if (isset($_GET['notif_guru'])): ?>
-                    <div style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
+                    <div
+                        style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
                         <span style="font-size:1.4rem;"></span> Operasi Guru & Staff berhasil.
                     </div>
                 <?php endif; ?>
@@ -1101,25 +1427,35 @@ if($res_fasilitas_query){
                             <input type="hidden" name="action_guru" id="guruActionNative" value="create">
                             <input type="hidden" name="id_guru" id="guruIdNative" value="">
                             <input type="hidden" name="foto_lama_guru" id="guruFotoLamaNative" value="">
-                            
+
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Nama Guru/Staff <span style="color:red;">*</span></label>
-                                    <input type="text" name="nama_guru" id="guruNamaNative" class="form-control" placeholder="Nama lengkap..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Nama Guru/Staff
+                                        <span style="color:red;">*</span></label>
+                                    <input type="text" name="nama_guru" id="guruNamaNative" class="form-control"
+                                        placeholder="Nama lengkap..." required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Mata Pelajaran / Posisi <span style="color:red;">*</span></label>
-                                    <input type="text" name="mapel_guru" id="guruMapelNative" class="form-control" placeholder="Contoh: Guru Matematika" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Mata Pelajaran /
+                                        Posisi <span style="color:red;">*</span></label>
+                                    <input type="text" name="mapel_guru" id="guruMapelNative" class="form-control"
+                                        placeholder="Contoh: Guru Matematika" required
+                                        style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
                                 </div>
                                 <div class="form-group" style="grid-column:1/-1;">
-                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload Foto</label>
-                                    <input type="file" name="foto_guru" id="guruFotoNative" accept="image/*" style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
-                                    <small style="display:block;margin-top:.5rem;color:#6b7280;" id="infoFotoLamaGuru"></small>
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload
+                                        Foto</label>
+                                    <input type="file" name="foto_guru" id="guruFotoNative" accept="image/*"
+                                        style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
+                                    <small style="display:block;margin-top:.5rem;color:#6b7280;"
+                                        id="infoFotoLamaGuru"></small>
                                 </div>
                             </div>
                             <div style="display:flex;gap:1rem;margin-top:1.5rem;">
                                 <button type="submit" class="btn-primary"> Simpan Data</button>
-                                <button type="button" class="btn-secondary" onclick="document.getElementById('formGuruWrapNative').style.display='none'">Batal</button>
+                                <button type="button" class="btn-secondary"
+                                    onclick="document.getElementById('formGuruWrapNative').style.display='none'">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -1140,20 +1476,29 @@ if($res_fasilitas_query){
                             </thead>
                             <tbody>
                                 <?php if (empty($daftar_guru)): ?>
-                                    <tr><td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada data guru/staff.</td></tr>
+                                    <tr>
+                                        <td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;"> Belum ada
+                                            data guru/staff.</td>
+                                    </tr>
                                 <?php else: ?>
-                                    <?php $no=1; foreach($daftar_guru as $gr): ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_guru as $gr): ?>
                                         <tr>
                                             <td><?php echo $no++; ?></td>
                                             <td>
-                                                <img src="<?php echo htmlspecialchars(!empty($gr['foto']) ? $gr['foto'] : 'https://via.placeholder.com/60x40?text=No+Img'); ?>" onerror="this.src='https://via.placeholder.com/60x40?text=No+Img'" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
+                                                <img src="<?php echo htmlspecialchars(!empty($gr['foto']) ? $gr['foto'] : 'https://via.placeholder.com/60x40?text=No+Img'); ?>"
+                                                    onerror="this.src='https://via.placeholder.com/60x40?text=No+Img'"
+                                                    style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
                                             </td>
                                             <td><strong><?php echo htmlspecialchars($gr['nama guru']); ?></strong></td>
                                             <td><?php echo htmlspecialchars($gr['mapel guru']); ?></td>
                                             <td>
                                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                                    <button class="btn-small btn-edit" onclick='editGuruNative(<?php echo htmlspecialchars(json_encode($gr), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
-                                                    <a href="dashboard-superadmin.php?hapus_guru=<?php echo $gr['id']; ?>" class="btn-small btn-delete" onclick="confirmHapus(event, 'Hapus Guru', 'Yakin ingin menghapus '<?php echo addslashes($gr['nama guru']); ?>'?')">Hapus</a>
+                                                    <button class="btn-small btn-edit"
+                                                        onclick='editGuruNative(<?php echo htmlspecialchars(json_encode($gr), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
+                                                    <a href="dashboard-superadmin.php?hapus_guru=<?php echo $gr['id']; ?>"
+                                                        class="btn-small btn-delete"
+                                                        onclick="confirmHapus(event, 'Hapus Guru', 'Yakin ingin menghapus '<?php echo addslashes($gr['nama guru']); ?>'?')">Hapus</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1196,7 +1541,7 @@ if($res_fasilitas_query){
                                 <?php if (empty($daftar_pesan)): ?>
                                     <tr>
                                         <td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;">
-                                             Belum ada pesan masuk.
+                                            Belum ada pesan masuk.
                                         </td>
                                     </tr>
                                 <?php else: ?>
@@ -1214,13 +1559,13 @@ if($res_fasilitas_query){
                                                 '<?php echo addslashes(htmlspecialchars($pesan['judul'])); ?>',
                                                 '<?php echo addslashes(htmlspecialchars($pesan['deskripsi'])); ?>'
                                             )">
-                                                     Lihat Pesan
+                                                    Lihat Pesan
                                                 </button>
                                                 <a href="dashboard-superadmin.php?hapus_pesan=<?php echo $pesan['id']; ?>&tab=messages"
                                                     onclick="confirmHapus(event, 'Hapus Pesan', 'Yakin ingin menghapus pesan dari \'<?php echo addslashes(htmlspecialchars($pesan['username'])); ?>\'?')"
                                                     class="btn-small btn-delete"
                                                     style="text-decoration:none;display:inline-flex;align-items:center;">
-                                                     Hapus
+                                                    Hapus
                                                 </a>
                                             </td>
                                         </tr>
@@ -1230,6 +1575,186 @@ if($res_fasilitas_query){
                         </table>
                     </div>
                 </div>
+            </div>
+            <!-- ===================== KELOLA PENDAFTARAN TAB ===================== -->
+            <div id="pendaftaran" class="tab-content">
+                <div class="page-header">
+                    <h1>Pendaftaran PPDB</h1>
+                    <p>Total <strong><?php echo $total_pendaftaran; ?></strong> pendaftaran masuk melalui website</p>
+                </div>
+
+                <?php if (isset($_GET['notif']) && $_GET['notif'] === 'hapus_pendaftaran_berhasil'): ?>
+                    <div
+                        style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;border:1px solid #6ee7b7;display:flex;align-items:center;gap:.75rem;">
+                        <span style="font-size:1.4rem;">✅</span> Data pendaftaran berhasil dihapus.
+                    </div>
+                <?php endif; ?>
+
+                <div class="section-card">
+                    <h2>Daftar Calon Siswa</h2>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Siswa</th>
+                                    <th>Asal Sekolah</th>
+                                    <th>Email</th>
+                                    <th>No. WhatsApp</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($daftar_pendaftaran)): ?>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af;">
+                                            Belum ada data pendaftaran masuk.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_pendaftaran as $pdft): ?>
+                                        <tr>
+                                            <td><?php echo $no++; ?></td>
+                                            <td><strong><?php echo htmlspecialchars($pdft['nama']); ?></strong></td>
+                                            <td><?php echo htmlspecialchars($pdft['asal sekolah']); ?></td>
+                                            <td><?php echo htmlspecialchars($pdft['email']); ?></td>
+                                            <td>
+                                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $pdft['wa/nomer']); ?>" target="_blank" style="color: #10b981; text-decoration: none; font-weight: 600;">
+                                                    <i class='bx bxl-whatsapp'></i> <?php echo htmlspecialchars($pdft['wa/nomer']); ?>
+                                                </a>
+                                            </td>
+                                            <td style="display:flex;gap:6px;flex-wrap:wrap;">
+                                                <button class="btn-small btn-view" onclick='lihatDetailPendaftaran(<?php echo htmlspecialchars(json_encode($pdft), ENT_QUOTES, "UTF-8"); ?>)'>
+                                                    Detail
+                                                </button>
+                                                <a href="dashboard-superadmin.php?hapus_pendaftaran=<?php echo $pdft['id']; ?>&tab=pendaftaran"
+                                                    onclick="confirmHapus(event, 'Hapus Pendaftaran', 'Yakin ingin menghapus data pendaftaran dari \'<?php echo addslashes(htmlspecialchars($pdft['nama'])); ?>\'?')"
+                                                    class="btn-small btn-delete"
+                                                    style="text-decoration:none;display:inline-flex;align-items:center;">
+                                                    Hapus
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Modal Detail Pendaftaran -->
+                <div id="modalDetailPendaftaran"
+                    style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);">
+                    <div
+                        style="background:#fff;margin:6% auto;padding:2rem 2.5rem;border-radius:16px;width:90%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;animation:fadeInModal .25s ease;">
+                        <div
+                            style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;border-bottom:2px solid #f3f4f6;padding-bottom:1rem;">
+                            <h2 style="color:#1f2937;margin:0;font-size:1.3rem;"> Detail Pendaftaran Siswa</h2>
+                            <span onclick="tutupModalPendaftaran()"
+                                style="font-size:2rem;font-weight:bold;cursor:pointer;color:#9ca3af;line-height:1;">&times;</span>
+                        </div>
+                        <div style="display:grid;gap:1rem;">
+                            <div style="background:#f9fafb;padding:1rem;border-radius:10px;border:1px solid #e5e7eb;">
+                                <p style="font-size:0.75rem;color:#6b7280;margin:0 0 4px;"> Nama Lengkap Siswa</p>
+                                <p id="pdftNama" style="font-weight:700;color:#1f2937;margin:0;font-size:1.1rem;"></p>
+                            </div>
+                            <div style="background:#f9fafb;padding:1rem;border-radius:10px;border:1px solid #e5e7eb;">
+                                <p style="font-size:0.75rem;color:#6b7280;margin:0 0 4px;"> Asal Sekolah</p>
+                                <p id="pdftSekolah" style="font-weight:600;color:#1f2937;margin:0;font-size:1rem;"></p>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                                <div style="background:#f9fafb;padding:1rem;border-radius:10px;border:1px solid #e5e7eb;">
+                                    <p style="font-size:0.75rem;color:#6b7280;margin:0 0 4px;"> Email</p>
+                                    <p id="pdftEmail" style="font-weight:600;color:#2563eb;margin:0;font-size:0.9rem;word-break:break-all;"></p>
+                                </div>
+                                <div style="background:#f9fafb;padding:1rem;border-radius:10px;border:1px solid #e5e7eb;">
+                                    <p style="font-size:0.75rem;color:#6b7280;margin:0 0 4px;"> No. WhatsApp</p>
+                                    <p id="pdftWA" style="font-weight:600;color:#10b981;margin:0;font-size:0.9rem;"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:1.5rem;text-align:right;">
+                            <button onclick="tutupModalPendaftaran()"
+                                style="background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;padding:.7rem 1.8rem;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ===================== KELOLA KOMENTAR TAB ===================== -->
+            <div id="komentar" class="tab-content">
+                <div class="page-header">
+                    <h1>Kelola Komentar</h1>
+                    <p>Total <strong><?php echo $total_komentar; ?></strong> komentar masuk (<?php echo $total_pending_komentar; ?> menunggu moderasi)</p>
+                </div>
+
+                <div class="section-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                        <h2 style="margin:0;">Moderasi Komentar</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Komentar</th>
+                                    <th>Status</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($daftar_komentar)): ?>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af;">
+                                            Belum ada komentar masuk.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_komentar as $kom): ?>
+                                        <tr>
+                                            <td><?php echo $no++; ?></td>
+                                            <td><strong><?php echo htmlspecialchars($kom['nama']); ?></strong></td>
+                                            <td>
+                                                <div style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="<?php echo htmlspecialchars($kom['komentar']); ?>">
+                                                    <?php echo htmlspecialchars($kom['komentar']); ?>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <?php if ($kom['status'] === 'pending'): ?>
+                                                    <span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:12px;font-size:0.75rem;font-weight:700;">Pending</span>
+                                                <?php else: ?>
+                                                    <span style="background:#d1fae5;color:#065f46;padding:4px 10px;border-radius:12px;font-size:0.75rem;font-weight:700;">Approved</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo date('d/m/Y', strtotime($kom['created_ad'])); ?></td>
+                                            <td style="display:flex;gap:6px;">
+                                                <?php if ($kom['status'] === 'pending'): ?>
+                                                    <a href="dashboard-superadmin.php?approve_komentar=<?php echo $kom['id']; ?>&tab=komentar" 
+                                                       class="btn-small" style="background:#10b981;color:white;text-decoration:none;padding:5px 12px;border-radius:6px;font-size:0.8rem;font-weight:600;">
+                                                        Setujui
+                                                    </a>
+                                                <?php endif; ?>
+                                                <a href="dashboard-superadmin.php?hapus_komentar=<?php echo $kom['id']; ?>&tab=komentar"
+                                                    onclick="confirmHapus(event, 'Hapus Komentar', 'Yakin ingin menghapus komentar dari \'<?php echo addslashes(htmlspecialchars($kom['nama'])); ?>\'?')"
+                                                    class="btn-small btn-delete"
+                                                    style="text-decoration:none;">
+                                                    Hapus
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="height: 50px;"></div> <!-- Spacer -->
             </div>
         </main>
     </div>
@@ -1311,16 +1836,16 @@ if($res_fasilitas_query){
         // ======== BERITA CRUD NATIVE ========
         function bukaFormBeritaNative(mode) {
             document.getElementById('formBeritaWrapNative').style.display = 'block';
-            if(mode === 'tambah') {
+            if (mode === 'tambah') {
                 document.getElementById('formBeritaTitleNative').textContent = 'Tambah Berita Baru';
                 document.getElementById('beritaActionNative').value = 'create';
                 document.getElementById('beritaIdNative').value = '';
                 document.getElementById('beritaFotoLamaNative').value = '';
                 document.getElementById('beritaJudulNative').value = '';
-                
+
                 let sel = document.getElementById('beritaKategoriNative');
                 Array.from(sel.options).forEach(opt => {
-                    if(!['', 'prestasi', 'pengumuman', 'pilihan utama'].includes(opt.value)) {
+                    if (!['', 'prestasi', 'pengumuman', 'pilihan utama'].includes(opt.value)) {
                         sel.remove(opt.index);
                     }
                 });
@@ -1339,24 +1864,24 @@ if($res_fasilitas_query){
             document.getElementById('beritaIdNative').value = b.id;
             document.getElementById('beritaFotoLamaNative').value = b.foto || '';
             document.getElementById('beritaJudulNative').value = b.judul;
-            
+
             // Set category dropdown, try case-insensitive match
             let kat = (b.kategori || '').toLowerCase();
             let sel = document.getElementById('beritaKategoriNative');
             sel.value = kat;
             // If it doesn't match standard options, you could add it or leave empty
-            if(!sel.value && b.kategori) {
+            if (!sel.value && b.kategori) {
                 let opt = document.createElement('option');
                 opt.value = b.kategori;
                 opt.text = b.kategori;
                 sel.add(opt);
                 sel.value = b.kategori;
             }
-            
+
             document.getElementById('beritaTanggalNative').value = b.tanggal;
             document.getElementById('beritaDeskripsiNative').value = b.deskripsi || '';
-            
-            if(b.foto) {
+
+            if (b.foto) {
                 document.getElementById('infoFotoLamaBerita').innerHTML = 'Foto saat ini: <b>' + b.foto + '</b>';
             } else {
                 document.getElementById('infoFotoLamaBerita').innerHTML = '';
@@ -1366,15 +1891,15 @@ if($res_fasilitas_query){
 
         function previewModalBeritaNative(b) {
             document.getElementById('modalBeritaFotoNative').src = b.foto || 'https://via.placeholder.com/600x400?text=No+Image';
-            document.getElementById('modalBeritaTanggalNative').textContent = new Date(b.tanggal).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
+            document.getElementById('modalBeritaTanggalNative').textContent = new Date(b.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
             document.getElementById('modalBeritaJudulNative').textContent = b.judul;
             document.getElementById('modalBeritaDeskripsiNative').textContent = b.deskripsi;
             document.getElementById('modalDetailBeritaNative').style.display = 'block';
         }
-// ======== GALERI CRUD NATIVE ========
+        // ======== GALERI CRUD NATIVE ========
         function bukaFormGaleriNative(mode) {
             document.getElementById('formGaleriWrapNative').style.display = 'block';
-            if(mode === 'tambah') {
+            if (mode === 'tambah') {
                 document.getElementById('formGaleriTitleNative').textContent = 'Tambah Foto Baru';
                 document.getElementById('galeriActionNative').value = 'create';
                 document.getElementById('galeriIdNative').value = '';
@@ -1396,8 +1921,8 @@ if($res_fasilitas_query){
             document.getElementById('galeriJudulNative').value = g.judul;
             document.getElementById('galeriKeteranganNative').value = g.kategori || '';
             document.getElementById('galeriDeskripsiNative').value = g.deskripsi || '';
-            
-            if(g.foto) {
+
+            if (g.foto) {
                 document.getElementById('infoFotoLama').innerHTML = 'Foto saat ini tersimpan: <b>' + g.foto + '</b>. <br>Biarkan kosong jika tidak ingin ganti foto baru.';
             } else {
                 document.getElementById('infoFotoLama').innerHTML = '';
@@ -1416,7 +1941,7 @@ if($res_fasilitas_query){
         // ======== EKSKUL CRUD NATIVE ========
         function bukaFormEkskulNative(mode) {
             document.getElementById('formEkskulWrapNative').style.display = 'block';
-            if(mode === 'tambah') {
+            if (mode === 'tambah') {
                 document.getElementById('formEkskulTitleNative').textContent = 'Tambah Ekskul Baru';
                 document.getElementById('ekskulActionNative').value = 'create';
                 document.getElementById('ekskulIdNative').value = '';
@@ -1436,8 +1961,8 @@ if($res_fasilitas_query){
             document.getElementById('ekskulFotoLamaNative').value = e.foto || '';
             document.getElementById('ekskulNamaNative').value = e.nama;
             document.getElementById('ekskulDeskripsiNative').value = e.deskripsi || '';
-            
-            if(e.foto) {
+
+            if (e.foto) {
                 document.getElementById('infoFotoLamaEkskul').innerHTML = 'Foto saat ini: <b>' + e.foto + '</b>';
             } else {
                 document.getElementById('infoFotoLamaEkskul').innerHTML = '';
@@ -1448,7 +1973,7 @@ if($res_fasilitas_query){
         // ======== FASILITAS CRUD NATIVE ========
         function bukaFormFasilitasNative(mode) {
             document.getElementById('formFasilitasWrapNative').style.display = 'block';
-            if(mode === 'tambah') {
+            if (mode === 'tambah') {
                 document.getElementById('formFasilitasTitleNative').textContent = 'Tambah Fasilitas Baru';
                 document.getElementById('fasilitasActionNative').value = 'create';
                 document.getElementById('fasilitasIdNative').value = '';
@@ -1468,8 +1993,8 @@ if($res_fasilitas_query){
             document.getElementById('fasilitasFotoLamaNative').value = f.foto || '';
             document.getElementById('fasilitasNamaNative').value = f['nama fasilitas'] || '';
             document.getElementById('fasilitasDeskripsiNative').value = f.deskripsi || '';
-            
-            if(f.foto) {
+
+            if (f.foto) {
                 document.getElementById('infoFotoLamaFasilitas').innerHTML = 'Foto saat ini: <b>' + f.foto + '</b>';
             } else {
                 document.getElementById('infoFotoLamaFasilitas').innerHTML = '';
@@ -1480,7 +2005,7 @@ if($res_fasilitas_query){
         // ======== GURU CRUD NATIVE ========
         function bukaFormGuruNative(mode) {
             document.getElementById('formGuruWrapNative').style.display = 'block';
-            if(mode === 'tambah') {
+            if (mode === 'tambah') {
                 document.getElementById('formGuruTitleNative').textContent = 'Tambah Guru Baru';
                 document.getElementById('guruActionNative').value = 'create';
                 document.getElementById('guruIdNative').value = '';
@@ -1500,8 +2025,8 @@ if($res_fasilitas_query){
             document.getElementById('guruFotoLamaNative').value = g.foto || '';
             document.getElementById('guruNamaNative').value = g['nama guru'] || '';
             document.getElementById('guruMapelNative').value = g['mapel guru'] || '';
-            
-            if(g.foto) {
+
+            if (g.foto) {
                 document.getElementById('infoFotoLamaGuru').innerHTML = 'Foto saat ini: <b>' + g.foto + '</b>';
             } else {
                 document.getElementById('infoFotoLamaGuru').innerHTML = '';
@@ -1524,8 +2049,21 @@ if($res_fasilitas_query){
 
         // Pastikan close modal ditambahkan event targetnya
         const __oldOnClick = window.onclick;
+        function tutupModalPesan() { document.getElementById('modalLihatPesan').style.display = 'none'; }
+
+        function lihatDetailPendaftaran(data) {
+            document.getElementById('pdftNama').textContent = data.nama;
+            document.getElementById('pdftSekolah').textContent = data['asal sekolah'];
+            document.getElementById('pdftEmail').textContent = data.email;
+            document.getElementById('pdftWA').textContent = data['wa/nomer'];
+            document.getElementById('modalDetailPendaftaran').style.display = 'block';
+        }
+        function tutupModalPendaftaran() { document.getElementById('modalDetailPendaftaran').style.display = 'none'; }
+
         window.onclick = function (event) {
             if (__oldOnClick) __oldOnClick(event);
+            if (event.target.id === 'modalLihatPesan') tutupModalPesan();
+            if (event.target.id === 'modalDetailPendaftaran') tutupModalPendaftaran();
             if (event.target.id === 'modalDetailGaleriNative') event.target.style.display = 'none';
             if (event.target.id === 'modalDetailBeritaNative') event.target.style.display = 'none';
         }

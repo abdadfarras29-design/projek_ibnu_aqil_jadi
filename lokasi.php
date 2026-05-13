@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lokasi - Website Sekolah</title>
+    <title>Lokasi - SMP IBNU AQIL</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -36,15 +36,9 @@
                         <li><a href="galeri.php">Galeri</a></li>
                     </ul>
                 </li>
-                <li class="dropdown">
-                    <a href="#" class="dropbtn active">Kontak ▾</a>
-                    <ul class="dropdown-content">
-                        <li><a href="lokasi.php">Lokasi</a></li>
-                        <li><a href="hubungi.php">Hubungi</a></li>
-                        <li><a href="pesan.php">Kirim Pesan</a></li>
-                    </ul>
-                </li>
-                <li><a href="https://s.id/brosur_PPDB_IBNU_AQIL_BOGOR_2024_2025" target="_blank">PPDB</a></li>
+                <li><a href="lokasi.php" class="active">Lokasi</a></li>
+                <li><a href="hubungi.php">Hubungi</a></li>
+                <li><a href="ppdb.php" class="nav-ppdb-btn">PPDB</a></li>
                 <li><a href="login.php" class="nav-login-btn">Login</a></li>
             </ul>
             <div class="hamburger" onclick="toggleMenu()">
@@ -59,23 +53,24 @@
     <section class="section active" style="margin-top: 100px;">
         <h2 class="section-title">Lokasi Sekolah</h2>
         <div class="profile-container">
-            <h3 style="color: var(--dark-green); margin-bottom: 1rem;">Alamat Lengkap</h3>
-            <p style="line-height: 1.8; color: var(--text-gray); font-size: 1.1rem;">
-                Jl. Raya Laladon No.256, Laladon<br>
-                Kec. Ciomas, Kabupaten Bogor<br>
-                Provinsi Jawa Barat 16610<br>
-                Indonesia
-            </p>
-
-            <div class="map-container">
-                <!-- koordinat lokasi sekolah -->
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1146.5153848715959!2d106.7543699960822!3d-6.5789587598387245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c53be8234c07%3A0xb3f01c4fad0a0492!2sIBNU%20AQIL%20Education%20Center!5e0!3m2!1sid!2sid!4v1770696079034!5m2!1sid!2sid"
-                    allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="color: var(--dark-green); margin-bottom: 1rem;">Alamat Lengkap</h3>
+                <p style="line-height: 1.8; color: var(--text-gray); font-size: 1.1rem;">
+                    Jl. Raya Laladon No.256, Laladon<br>
+                    Kec. Ciomas, Kabupaten Bogor<br>
+                    Provinsi Jawa Barat 16610<br>
+                    Indonesia
+                </p>
             </div>
 
-
+            <div class="map-container"
+                style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1146.5153848715959!2d106.7543699960822!3d-6.5789587598387245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c53be8234c07%3A0xb3f01c4fad0a0492!2sIBNU%20AQIL%20Education%20Center!5e0!3m2!1sid!2sid!4v1770696079034!5m2!1sid!2sid"
+                    width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy">
+                </iframe>
+            </div>
+        </div>
     </section>
 
     <!-- Footer -->
