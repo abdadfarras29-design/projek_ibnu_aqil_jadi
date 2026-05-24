@@ -1,4 +1,5 @@
 <?php
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -27,6 +28,7 @@
                         <li><a href="profile.php">Profil Sekolah</a></li>
                         <li><a href="visi-misi.php">Visi & Misi</a></li>
                         <li><a href="guru-staff.php">Guru & Staff</a></li>
+                        <li><a href="osis-mpk.php">OSIS & MPK</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -39,7 +41,7 @@
                     </ul>
                 </li>
                 <li><a href="lokasi.php">Lokasi</a></li>
-                <li><a href="hubungi.php">Hubungi</a></li>
+                <li><a href="hubungi.php">Kontak</a></li>
                 <li><a href="ppdb.php" class="nav-ppdb-btn">PPDB</a></li>
                 <li><a href="login.php" class="nav-login-btn">Login</a></li>
             </ul>

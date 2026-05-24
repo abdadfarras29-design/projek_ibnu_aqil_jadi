@@ -455,6 +455,80 @@ if ($res_fasilitas_query) {
     }
 }
 
+// NATIVE SERVER CRUD INTRAKULIKULER (OSIS & MPK)
+if (isset($_GET['hapus_intrakulikuler']) && is_numeric($_GET['hapus_intrakulikuler'])) {
+    $id_hapus = intval($_GET['hapus_intrakulikuler']);
+    $q_foto = mysqli_prepare($KONEKSI, "SELECT foto FROM `intrakulikuler` WHERE id = ?");
+    mysqli_stmt_bind_param($q_foto, "i", $id_hapus);
+    mysqli_stmt_execute($q_foto);
+    $res_foto = mysqli_stmt_get_result($q_foto);
+    if ($row_foto = mysqli_fetch_assoc($res_foto)) {
+        if (!empty($row_foto['foto']) && file_exists($row_foto['foto'])) {
+            @unlink($row_foto['foto']);
+        }
+    }
+    mysqli_stmt_close($q_foto);
+
+    $stmt = mysqli_prepare($KONEKSI, "DELETE FROM `intrakulikuler` WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id_hapus);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    echo "<script>window.location.href='dashboard-superadmin.php?tab=osis_mpk&notif_osis_mpk=hapus_berhasil';</script>";
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_intrakulikuler'])) {
+    $action_intrakulikuler = $_POST['action_intrakulikuler'];
+    $nama = trim($_POST['nama_intrakulikuler'] ?? '');
+    $organisasi = trim($_POST['org_intrakulikuler'] ?? 'OSIS');
+    $jabatan_raw = trim($_POST['jabatan_intrakulikuler'] ?? '');
+    
+    // Combine organization and role into 'role/jabatan'
+    $role_jabatan = $organisasi . " - " . $jabatan_raw;
+    
+    $foto_path = $_POST['foto_lama_intrakulikuler'] ?? '';
+
+    if (isset($_FILES['foto_intrakulikuler']) && $_FILES['foto_intrakulikuler']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = 'uploads/intrakulikuler/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        $ext = pathinfo($_FILES['foto_intrakulikuler']['name'], PATHINFO_EXTENSION);
+        $filename = 'intrakulikuler_' . time() . '_' . mt_rand(100, 999) . '.' . strtolower($ext);
+        $dest = $uploadDir . $filename;
+        if (move_uploaded_file($_FILES['foto_intrakulikuler']['tmp_name'], $dest)) {
+            $foto_path = $dest;
+            if (!empty($_POST['foto_lama_intrakulikuler']) && file_exists($_POST['foto_lama_intrakulikuler'])) {
+                @unlink($_POST["foto_lama_intrakulikuler"]);
+            }
+        }
+    }
+
+    if ($action_intrakulikuler === 'create') {
+        $stmt = mysqli_prepare($KONEKSI, "INSERT INTO `intrakulikuler` (foto, nama, `role/jabatan`) VALUES (?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, "sss", $foto_path, $nama, $role_jabatan);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    } elseif ($action_intrakulikuler === 'update' && !empty($_POST['id_intrakulikuler'])) {
+        $id = intval($_POST['id_intrakulikuler']);
+        $stmt = mysqli_prepare($KONEKSI, "UPDATE `intrakulikuler` SET foto=?, nama=?, `role/jabatan`=? WHERE id=?");
+        mysqli_stmt_bind_param($stmt, "sssi", $foto_path, $nama, $role_jabatan, $id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+    $msg = ($action_intrakulikuler === 'create') ? 'tambah_berhasil' : 'edit_berhasil';
+    echo "<script>window.location.href='dashboard-superadmin.php?tab=osis_mpk&notif_osis_mpk=$msg';</script>";
+    exit();
+}
+
+$res_intrakulikuler_query = mysqli_query($KONEKSI, "SELECT * FROM `intrakulikuler` ORDER BY id DESC");
+$daftar_intrakulikuler = [];
+if ($res_intrakulikuler_query) {
+    while ($row = mysqli_fetch_assoc($res_intrakulikuler_query)) {
+        $daftar_intrakulikuler[] = $row;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -513,6 +587,10 @@ if ($res_fasilitas_query) {
                 <a href="#" class="menu-item" onclick="showTab('ekskul')">
                     <i class="icon bx bx-trophy"></i>
                     <span>Kelola Ekskul</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showTab('osis_mpk')">
+                    <i class="icon bx bx-group"></i>
+                    <span>Kelola OSIS & MPK</span>
                 </a>
                 <a href="#" class="menu-item" onclick="showTab('guru')">
                     <i class="icon bx bx-user-circle"></i>
@@ -806,6 +884,11 @@ if ($res_fasilitas_query) {
                         <h3>Ekstrakulikuler</h3>
                         <p>Kelola ekstrakurikuler</p>
                         <button class="btn-primary" onclick="showTab('ekskul')">Edit Ekskul</button>
+                    </div>
+                    <div class="content-card">
+                        <h3>OSIS & MPK</h3>
+                        <p>Kelola data anggota OSIS dan MPK</p>
+                        <button class="btn-primary" onclick="showTab('osis_mpk')">Edit OSIS & MPK</button>
                     </div>
                     <div class="content-card">
                         <h3>Guru & Staff</h3>
@@ -1405,6 +1488,122 @@ if ($res_fasilitas_query) {
                 </div>
             </div>
 
+            <!-- ===================== KELOLA OSIS & MPK TAB ===================== -->
+            <div id="osis_mpk" class="tab-content">
+                <div class="page-header">
+                    <h1>Kelola OSIS & MPK</h1>
+                    <button class="btn-primary" onclick="bukaFormIntrakulikulerNative('tambah')" id="btnTambahIntrakulikuler">+ Tambah Anggota</button>
+                </div>
+
+                <?php if (isset($_GET['notif_osis_mpk'])): ?>
+                    <div style="background:#d1fae5;color:#065f46;padding:1rem 1.5rem;border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;">
+                        <span style="font-size:1.4rem;"></span> Operasi OSIS & MPK berhasil.
+                    </div>
+                <?php endif; ?>
+
+                <div id="formIntrakulikulerWrapNative" style="display:none; margin-bottom: 2rem;">
+                    <div class="section-card" style="border-left:4px solid #f59e0b;">
+                        <h2 id="formIntrakulikulerTitleNative" style="margin-bottom:1.5rem;">Tambah Anggota Baru</h2>
+                        <form action="dashboard-superadmin.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="action_intrakulikuler" id="intrakulikulerActionNative" value="create">
+                            <input type="hidden" name="id_intrakulikuler" id="intrakulikulerIdNative" value="">
+                            <input type="hidden" name="foto_lama_intrakulikuler" id="intrakulikulerFotoLamaNative" value="">
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Nama Lengkap <span style="color:red;">*</span></label>
+                                    <input type="text" name="nama_intrakulikuler" id="intrakulikulerNamaNative" class="form-control" placeholder="Nama lengkap..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                </div>
+
+                                <div class="form-group">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Organisasi <span style="color:red;">*</span></label>
+                                    <select name="org_intrakulikuler" id="intrakulikulerOrgNative" class="form-control" required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;background-color:white;">
+                                        <option value="OSIS">OSIS</option>
+                                        <option value="MPK">MPK</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Jabatan / Posisi <span style="color:red;">*</span></label>
+                                    <input type="text" name="jabatan_intrakulikuler" id="intrakulikulerJabatanNative" class="form-control" placeholder="Contoh: Ketua, Sekretaris, dll..." required style="width:100%;padding:.75rem 1rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;">
+                                </div>
+
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label style="font-weight:600;display:block;margin-bottom:.5rem;">Upload Foto</label>
+                                    <input type="file" name="foto_intrakulikuler" id="intrakulikulerFotoNative" accept="image/*" style="width:100%;padding:.6rem;border:1.5px dashed #d1d5db;border-radius:8px;">
+                                    <small style="display:block;margin-top:.5rem;color:#6b7280;" id="infoFotoLamaIntrakulikuler"></small>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+                                <button type="submit" class="btn-primary">Simpan Anggota</button>
+                                <button type="button" class="btn-secondary" onclick="document.getElementById('formIntrakulikulerWrapNative').style.display='none'">Batal</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h2>Daftar Anggota OSIS & MPK</h2>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Foto</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Organisasi</th>
+                                    <th>Jabatan/Posisi</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($daftar_intrakulikuler)): ?>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af;">Belum ada data anggota OSIS/MPK.</td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php $no = 1;
+                                    foreach ($daftar_intrakulikuler as $item): 
+                                        // Parse role/jabatan to separate Org and Jabatan for display
+                                        $display_org = 'OSIS';
+                                        $display_jabatan = $item['role/jabatan'];
+                                        if (strpos($item['role/jabatan'], ' - ') !== false) {
+                                            list($display_org, $display_jabatan) = explode(' - ', $item['role/jabatan'], 2);
+                                        }
+                                    ?>
+                                        <tr>
+                                            <td><?php echo $no++; ?></td>
+                                            <td>
+                                                <img src="<?php echo htmlspecialchars(!empty($item['foto']) ? $item['foto'] : 'https://via.placeholder.com/80x50?text=No+Img'); ?>"
+                                                    onerror="this.src='https://via.placeholder.com/80x50?text=No+Img'"
+                                                    style="width:80px;height:50px;object-fit:cover;border-radius:8px;">
+                                            </td>
+                                            <td><strong><?php echo htmlspecialchars($item['nama']); ?></strong></td>
+                                            <td>
+                                                <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.85rem;font-weight:600;
+                                                    <?php echo $display_org === 'MPK' ? 'background:#dbeafe;color:#1e40af;' : 'background:#d1fae5;color:#065f46;'; ?>">
+                                                    <?php echo htmlspecialchars($display_org); ?>
+                                                </span>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($display_jabatan); ?></td>
+                                            <td>
+                                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                                    <button class="btn-small btn-edit"
+                                                        onclick='editIntrakulikulerNative(<?php echo htmlspecialchars(json_encode($item), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
+                                                    <a href="dashboard-superadmin.php?hapus_intrakulikuler=<?php echo $item['id']; ?>"
+                                                        class="btn-small btn-delete"
+                                                        onclick="confirmHapus(event, 'Hapus Anggota', 'Yakin ingin menghapus anggota \'<?php echo addslashes($item['nama']); ?>\'?')">Hapus</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- ===================== KELOLA GURU TAB ===================== -->
             <div id="guru" class="tab-content">
                 <div class="page-header">
@@ -1968,6 +2167,50 @@ if ($res_fasilitas_query) {
                 document.getElementById('infoFotoLamaEkskul').innerHTML = '';
             }
             document.getElementById('formEkskulWrapNative').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ======== OSIS & MPK (INTRAKULIKULER) CRUD NATIVE ========
+        function bukaFormIntrakulikulerNative(mode) {
+            document.getElementById('formIntrakulikulerWrapNative').style.display = 'block';
+            if (mode === 'tambah') {
+                document.getElementById('formIntrakulikulerTitleNative').textContent = 'Tambah Anggota Baru';
+                document.getElementById('intrakulikulerActionNative').value = 'create';
+                document.getElementById('intrakulikulerIdNative').value = '';
+                document.getElementById('intrakulikulerFotoLamaNative').value = '';
+                document.getElementById('intrakulikulerNamaNative').value = '';
+                document.getElementById('intrakulikulerOrgNative').value = 'OSIS';
+                document.getElementById('intrakulikulerJabatanNative').value = '';
+                document.getElementById('infoFotoLamaIntrakulikuler').innerHTML = '';
+            }
+            document.getElementById('formIntrakulikulerWrapNative').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function editIntrakulikulerNative(item) {
+            document.getElementById('formIntrakulikulerWrapNative').style.display = 'block';
+            document.getElementById('formIntrakulikulerTitleNative').textContent = 'Edit Anggota';
+            document.getElementById('intrakulikulerActionNative').value = 'update';
+            document.getElementById('intrakulikulerIdNative').value = item.id;
+            document.getElementById('intrakulikulerFotoLamaNative').value = item.foto || '';
+            document.getElementById('intrakulikulerNamaNative').value = item.nama;
+            
+            // Parse role/jabatan into Org and Position
+            let org = 'OSIS';
+            let jab = item['role/jabatan'];
+            if (item['role/jabatan'] && item['role/jabatan'].includes(' - ')) {
+                let parts = item['role/jabatan'].split(' - ');
+                org = parts[0];
+                jab = parts.slice(1).join(' - ');
+            }
+            
+            document.getElementById('intrakulikulerOrgNative').value = org;
+            document.getElementById('intrakulikulerJabatanNative').value = jab;
+
+            if (item.foto) {
+                document.getElementById('infoFotoLamaIntrakulikuler').innerHTML = 'Foto saat ini: <b>' + item.foto + '</b>';
+            } else {
+                document.getElementById('infoFotoLamaIntrakulikuler').innerHTML = '';
+            }
+            document.getElementById('formIntrakulikulerWrapNative').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // ======== FASILITAS CRUD NATIVE ========

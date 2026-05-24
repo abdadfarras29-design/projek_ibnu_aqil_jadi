@@ -47,7 +47,7 @@ if ($res_fasilitas) {
                     </ul>
                 </li>
                 <li><a href="lokasi.php">Lokasi</a></li>
-                <li><a href="hubungi.php">Hubungi</a></li>
+                <li><a href="hubungi.php">Kontak</a></li>
                 <li><a href="ppdb.php" class="nav-ppdb-btn">PPDB</a></li>
                 <li><a href="login.php" class="nav-login-btn">Login</a></li>
             </ul>

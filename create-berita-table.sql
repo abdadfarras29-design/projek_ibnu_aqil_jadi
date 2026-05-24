@@ -1,5 +1,9 @@
--- Jalankan di database: ibnu_aqil
-USE ibnu_aqil;
+-- ============================================================
+-- Tabel Berita untuk Website SMP IBNU AQIL
+-- Sesuaikan nama database sebelum import!
+-- Untuk hosting: USE website3_usersmp;
+-- Untuk lokal:   USE ibnu_aqil;
+-- ============================================================
 
 CREATE TABLE IF NOT EXISTS berita (
     id        INT(11)       NOT NULL AUTO_INCREMENT,

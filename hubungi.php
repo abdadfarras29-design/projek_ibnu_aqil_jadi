@@ -247,7 +247,7 @@ if ($res_komentar) {
                     </ul>
                 </li>
                 <li><a href="lokasi.php">Lokasi</a></li>
-                <li><a href="hubungi.php" class="active">Hubungi</a></li>
+                <li><a href="hubungi.php" class="active">Kontak</a></li>
                 <li><a href="ppdb.php" class="nav-ppdb-btn">PPDB</a></li>
                 <li><a href="login.php" class="nav-login-btn">Login</a></li>
             </ul>
@@ -386,11 +386,6 @@ if ($res_komentar) {
         <p style="margin-top: 0.5rem; font-size: 0.9rem;">Membentuk Generasi Cerdas & Berkarakter</p>
     </footer>
 
-    <script>
-        function toggleMenu() {
-            const menu = document.getElementById('navMenu');
-            menu.classList.toggle('active');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

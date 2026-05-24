@@ -1,8 +1,106 @@
--- Tambahan tabel untuk konten website sekolah
+-- ============================================================
+-- SQL Database untuk Website SMP IBNU AQIL
+-- Sesuaikan nama database sebelum import!
+-- Untuk hosting: USE website3_usersmp;
+-- Untuk lokal:   USE ibnu_aqil;
+-- ============================================================
 
-USE sekolah_kita;
+-- Tabel untuk Admin Login
+CREATE TABLE IF NOT EXISTS admin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabel untuk Profil Sekolah
+-- Tabel untuk Berita
+CREATE TABLE IF NOT EXISTS berita (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    judul VARCHAR(200) NOT NULL,
+    foto VARCHAR(200) NOT NULL DEFAULT '',
+    kategori ENUM('pengumuman','prestasi','pilihan utama') NOT NULL,
+    tanggal DATE NOT NULL,
+    deskripsi VARCHAR(500) NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Tabel untuk Fasilitas
+-- Kolom sesuai dashboard-superadmin.php: foto, `nama fasilitas`, deskripsi
+CREATE TABLE IF NOT EXISTS fasilitas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    foto VARCHAR(255) DEFAULT '',
+    `nama fasilitas` VARCHAR(100) NOT NULL,
+    deskripsi TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Ekstrakurikuler
+-- Nama tabel = esktrakulikuler (sesuai database & dashboard-superadmin.php)
+CREATE TABLE IF NOT EXISTS esktrakulikuler (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    foto VARCHAR(255) DEFAULT '',
+    nama VARCHAR(100) NOT NULL,
+    deskripsi TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Galeri
+CREATE TABLE IF NOT EXISTS galery (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    foto VARCHAR(255) DEFAULT '',
+    kategori VARCHAR(100) DEFAULT '',
+    judul VARCHAR(200) DEFAULT '',
+    deskripsi TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Guru & Staff
+CREATE TABLE IF NOT EXISTS `nama guru & staff` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    foto VARCHAR(255) DEFAULT '',
+    `nama guru` VARCHAR(100) NOT NULL,
+    `mapel guru` VARCHAR(100) DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Statistik Sekolah
+CREATE TABLE IF NOT EXISTS `jumlah siswa dll` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    siswa VARCHAR(20) DEFAULT '0',
+    guru VARCHAR(20) DEFAULT '0',
+    prestasi VARCHAR(20) DEFAULT '0',
+    `rombongan belajar` VARCHAR(20) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Pesan dari pengunjung (hubungi.php)
+-- Kolom: username, email, judul, deskripsi (sesuai hubungi.php)
+CREATE TABLE IF NOT EXISTS pesan (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    judul VARCHAR(200),
+    deskripsi TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Komentar (hubungi.php)
+-- Kolom: nama, komentar, status, created_ad (typo di database asli)
+CREATE TABLE IF NOT EXISTS komentar (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    komentar TEXT,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_ad TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Pendaftaran PPDB (ppdb.php)
+-- Kolom: nama, `asal sekolah`, email, `wa/nomer` (sesuai ppdb.php)
+CREATE TABLE IF NOT EXISTS pendaftaran (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    `asal sekolah` VARCHAR(200) DEFAULT '',
+    email VARCHAR(100) DEFAULT '',
+    `wa/nomer` VARCHAR(50) DEFAULT '',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk Profil Sekolah (kelola-konten.php)
 CREATE TABLE IF NOT EXISTS profil_sekolah (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nama_sekolah VARCHAR(200) NOT NULL,
@@ -14,45 +112,18 @@ CREATE TABLE IF NOT EXISTS profil_sekolah (
     npsn VARCHAR(20),
     status VARCHAR(50),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabel untuk Visi & Misi
+-- Tabel untuk Visi & Misi (kelola-konten.php)
 CREATE TABLE IF NOT EXISTS visi_misi (
     id INT AUTO_INCREMENT PRIMARY KEY,
     visi TEXT NOT NULL,
     misi TEXT NOT NULL,
     tujuan TEXT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabel untuk Fasilitas
-CREATE TABLE IF NOT EXISTS fasilitas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nama_fasilitas VARCHAR(100) NOT NULL,
-    deskripsi TEXT,
-    icon VARCHAR(50),
-    gambar_url VARCHAR(255),
-    urutan INT DEFAULT 0,
-    status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Tabel untuk Ekstrakurikuler
-CREATE TABLE IF NOT EXISTS ekstrakurikuler (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nama_ekskul VARCHAR(100) NOT NULL,
-    deskripsi TEXT,
-    pembina VARCHAR(100),
-    jadwal VARCHAR(100),
-    icon VARCHAR(50),
-    gambar_url VARCHAR(255),
-    status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Tabel untuk Lokasi
+-- Tabel untuk Lokasi (kelola-konten.php)
 CREATE TABLE IF NOT EXISTS lokasi (
     id INT AUTO_INCREMENT PRIMARY KEY,
     alamat TEXT NOT NULL,
@@ -65,9 +136,9 @@ CREATE TABLE IF NOT EXISTS lokasi (
     longitude DECIMAL(11, 8),
     google_maps_url TEXT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabel untuk Kontak
+-- Tabel untuk Kontak (kelola-konten.php)
 CREATE TABLE IF NOT EXISTS kontak (
     id INT AUTO_INCREMENT PRIMARY KEY,
     telepon VARCHAR(20),
@@ -79,19 +150,61 @@ CREATE TABLE IF NOT EXISTS kontak (
     twitter VARCHAR(100),
     youtube VARCHAR(100),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Insert data awal untuk Profil Sekolah
+-- ============================================================
+-- INSERT DATA AWAL
+-- ============================================================
+
+-- Admin default (username: admin, password: admin123)
+INSERT INTO admin (username, password) VALUES
+('admin', 'admin123');
+
+-- Data awal Berita
+INSERT INTO berita (judul, foto, kategori, tanggal, deskripsi) VALUES
+('SMP IBNU AQIL Meresmikan Laboratorium Komputer Generasi Terbaru',
+ 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=2069&auto=format&fit=crop',
+ 'pilihan utama', '2026-02-22',
+ 'Dalam upaya meningkatkan literasi digital siswa, SMP IBNU AQIL resmi membuka fasilitas laboratorium komputer tercanggih yang dilengkapi dengan 40 unit PC terbaru.'),
+('Siswa SMP IBNU AQIL Juara 1 Olimpiade Matematika Nasional',
+ 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=2071&auto=format&fit=crop',
+ 'prestasi', '2026-02-20',
+ 'Prestasi membanggakan kembali diraih oleh salah satu siswa didik kami yang berhasil menyabet medali emas dalam ajang Olimpiade Matematika tingkat Nasional.'),
+('Kegiatan Field Trip: Mengenal Ekosistem Hutan Mangrove',
+ 'https://images.unsplash.com/photo-1523050335456-cbb6e0b20152?q=80&w=2070&auto=format&fit=crop',
+ 'pengumuman', '2026-02-15',
+ 'Siswa kelas VIII melakukan kunjungan edukatif ke kawasan konservasi mangrove untuk menanamkan kepedulian terhadap lingkungan sejak dini.');
+
+-- Data awal Fasilitas (kolom: foto, `nama fasilitas`, deskripsi)
+INSERT INTO fasilitas (foto, `nama fasilitas`, deskripsi) VALUES
+('', 'Laboratorium Komputer', 'Dilengkapi dengan 40 unit komputer modern dan koneksi internet cepat'),
+('', 'Perpustakaan', 'Koleksi lebih dari 5000 buku dan ruang baca yang nyaman'),
+('', 'Laboratorium IPA', 'Fasilitas praktikum lengkap untuk Fisika, Kimia, dan Biologi'),
+('', 'Lapangan Olahraga', 'Lapangan basket, voli, dan futsal yang memadai'),
+('', 'Ruang Multimedia', 'Peralatan audio visual modern untuk pembelajaran interaktif'),
+('', 'Kantin Sehat', 'Menyediakan makanan bergizi dan sehat untuk siswa');
+
+-- Data awal Ekstrakurikuler (tabel: esktrakulikuler, kolom: foto, nama, deskripsi)
+INSERT INTO esktrakulikuler (foto, nama, deskripsi) VALUES
+('', 'Pramuka', 'Kegiatan kepramukaan untuk membentuk karakter dan leadership'),
+('', 'Basket', 'Ekstrakurikuler olahraga basket'),
+('', 'English Club', 'Meningkatkan kemampuan berbahasa Inggris'),
+('', 'Robotika', 'Belajar pemrograman dan robotika'),
+('', 'Seni Tari', 'Mengembangkan bakat seni tari tradisional dan modern'),
+('', 'Paduan Suara', 'Melatih vokal dan kerjasama tim');
+
+-- Data awal Statistik
+INSERT INTO `jumlah siswa dll` (siswa, guru, prestasi, `rombongan belajar`) VALUES
+('1250', '75', '150', '30');
+
+-- Data awal Profil Sekolah
 INSERT INTO profil_sekolah (nama_sekolah, deskripsi, sejarah, akreditasi, kepala_sekolah, npsn, status) VALUES
-('SEKOLAH KITA', 
+('SMP IBNU AQIL', 
 'Sekolah yang berkomitmen untuk memberikan pendidikan berkualitas dan membentuk karakter siswa yang berakhlak mulia.', 
-'Didirikan pada tahun 2000, Sekolah Kita telah menjadi institusi pendidikan terkemuka yang menghasilkan lulusan berprestasi.',
-'A',
-'Dr. Budi Santoso, M.Pd',
-'12345678',
-'Negeri');
+'Didirikan pada tahun 2000, SMP Ibnu Aqil telah menjadi institusi pendidikan terkemuka yang menghasilkan lulusan berprestasi.',
+'A', 'Dr. Budi Santoso, M.Pd', '12345678', 'Swasta');
 
--- Insert data awal untuk Visi & Misi
+-- Data awal Visi & Misi
 INSERT INTO visi_misi (visi, misi, tujuan) VALUES
 ('Menjadi sekolah unggulan yang menghasilkan lulusan berprestasi, berakhlak mulia, dan berwawasan global.',
 '1. Menyelenggarakan pembelajaran berkualitas yang inovatif dan kreatif
@@ -102,40 +215,11 @@ INSERT INTO visi_misi (visi, misi, tujuan) VALUES
 2. Menciptakan lingkungan belajar yang kondusif
 3. Menghasilkan lulusan yang siap bersaing di era global');
 
--- Insert data awal untuk Fasilitas
-INSERT INTO fasilitas (nama_fasilitas, deskripsi, icon, urutan) VALUES
-('Laboratorium Komputer', 'Dilengkapi dengan 40 unit komputer modern dan koneksi internet cepat', '💻', 1),
-('Perpustakaan', 'Koleksi lebih dari 5000 buku dan ruang baca yang nyaman', '📚', 2),
-('Laboratorium IPA', 'Fasilitas praktikum lengkap untuk Fisika, Kimia, dan Biologi', '🔬', 3),
-('Lapangan Olahraga', 'Lapangan basket, voli, dan futsal yang memadai', '⚽', 4),
-('Ruang Multimedia', 'Peralatan audio visual modern untuk pembelajaran interaktif', '🎥', 5),
-('Kantin Sehat', 'Menyediakan makanan bergizi dan sehat untuk siswa', '🍽️', 6);
+-- Data awal Lokasi
+INSERT INTO lokasi (alamat, kelurahan, kecamatan, kota, provinsi, kode_pos, latitude, longitude, google_maps_url) VALUES
+('Jl. Pendidikan No. 123', 'Depok', 'Pancoran Mas', 'Depok', 'Jawa Barat', '16431',
+-6.402484, 106.794243, 'https://maps.google.com/?q=-6.402484,106.794243');
 
--- Insert data awal untuk Ekstrakurikuler
-INSERT INTO ekstrakurikuler (nama_ekskul, deskripsi, pembina, jadwal) VALUES
-('Pramuka', 'Kegiatan kepramukaan untuk membentuk karakter dan leadership', 'Budi Santoso, S.Pd', 'Jumat, 14:00-16:00'),
-('Basket', 'Ekstrakurikuler olahraga basket', 'Ahmad Rizki, S.Pd', 'Selasa & Kamis, 15:00-17:00'),
-('English Club', 'Meningkatkan kemampuan berbahasa Inggris', 'Siti Nurhaliza, S.Pd', 'Rabu, 14:00-15:30'),
-('Robotika', 'Belajar pemrograman dan robotika', 'Dedi Kurniawan, S.Kom', 'Sabtu, 09:00-12:00'),
-('Seni Tari', 'Mengembangkan bakat seni tari tradisional dan modern', 'Dewi Lestari, S.Sn', 'Kamis, 14:00-16:00'),
-('Paduan Suara', 'Melatih vokal dan kerjasama tim', 'Rina Marlina, S.Pd', 'Rabu, 15:00-17:00');
-
--- Insert data awal untuk Lokasi
-INSERT INTO lokasi (alamat, kelurahan, kecamatan, kota, provinsi, kode_pos, latitude, longitude) VALUES
-('Jl. Pendidikan No. 123', 
-'Depok', 
-'Pancoran Mas', 
-'Depok', 
-'Jawa Barat', 
-'16431',
--6.402484,
-106.794243,
-'https://maps.google.com/?q=-6.402484,106.794243');
-
--- Insert data awal untuk Kontak
+-- Data awal Kontak
 INSERT INTO kontak (telepon, email, website, instagram, facebook) VALUES
-('(021) 12345678',
-'info@sekolahkita.sch.id',
-'www.sekolahkita.sch.id',
-'@sekolahkita',
-'SekolahKitaOfficial');
+('(021) 12345678', 'info@smpibnuaqil.sch.id', 'www.smpibnuaqil.sch.id', '@smpibnuaqil', 'SMPIbnuAqilOfficial');
