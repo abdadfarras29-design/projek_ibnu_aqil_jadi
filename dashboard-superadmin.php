@@ -297,7 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_statistik'])) 
     $rombongan_belajar = trim($_POST['rombongan_belajar'] ?? '0');
 
     // Check if a row exists
-    $cek = mysqli_query($KONEKSI, "SELECT id FROM `jumlah siswa dll` LIMIT 1");
+    $cek = mysqli_query($KONEKSI, "SELECT id FROM `jumlah siswa dll` ORDER BY id DESC LIMIT 1");
     if ($cek && mysqli_num_rows($cek) > 0) {
         $row = mysqli_fetch_assoc($cek);
         $id = $row['id'];
