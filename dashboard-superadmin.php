@@ -1,5 +1,8 @@
 <?php
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit();
@@ -505,13 +508,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_intrakulikuler
     }
 
     if ($action_intrakulikuler === 'create') {
-        $stmt = mysqli_prepare($KONEKSI, "INSERT INTO `intrakulikuler` (foto, nama, `role/jabatan`) VALUES (?, ?, ?)");
+        $stmt = mysqli_prepare($KONEKSI, "INSERT INTO `intrakulikuler` (foto, nama, `role_jabatan`) VALUES (?, ?, ?)");
         mysqli_stmt_bind_param($stmt, "sss", $foto_path, $nama, $role_jabatan);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     } elseif ($action_intrakulikuler === 'update' && !empty($_POST['id_intrakulikuler'])) {
         $id = intval($_POST['id_intrakulikuler']);
-        $stmt = mysqli_prepare($KONEKSI, "UPDATE `intrakulikuler` SET foto=?, nama=?, `role/jabatan`=? WHERE id=?");
+        $stmt = mysqli_prepare($KONEKSI, "UPDATE `intrakulikuler` SET foto=?, nama=?, `role_jabatan`=? WHERE id=?");
         mysqli_stmt_bind_param($stmt, "sssi", $foto_path, $nama, $role_jabatan, $id);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
@@ -1566,9 +1569,9 @@ if ($res_intrakulikuler_query) {
                                     foreach ($daftar_intrakulikuler as $item): 
                                         // Parse role/jabatan to separate Org and Jabatan for display
                                         $display_org = 'OSIS';
-                                        $display_jabatan = $item['role/jabatan'];
-                                        if (strpos($item['role/jabatan'], ' - ') !== false) {
-                                            list($display_org, $display_jabatan) = explode(' - ', $item['role/jabatan'], 2);
+                                        $display_jabatan = $item['role_jabatan'] ?? '';
+                                        if (!empty($item['role_jabatan']) && strpos($item['role_jabatan'], ' - ') !== false) {
+                                            list($display_org, $display_jabatan) = explode(' - ', $item['role_jabatan'], 2);
                                         }
                                     ?>
                                         <tr>
@@ -2195,9 +2198,9 @@ if ($res_intrakulikuler_query) {
             
             // Parse role/jabatan into Org and Position
             let org = 'OSIS';
-            let jab = item['role/jabatan'];
-            if (item['role/jabatan'] && item['role/jabatan'].includes(' - ')) {
-                let parts = item['role/jabatan'].split(' - ');
+            let jab = item['role_jabatan'];
+            if (item['role_jabatan'] && item['role_jabatan'].includes(' - ')) {
+                let parts = item['role_jabatan'].split(' - ');
                 org = parts[0];
                 jab = parts.slice(1).join(' - ');
             }

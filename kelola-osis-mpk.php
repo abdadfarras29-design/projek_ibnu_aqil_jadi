@@ -1,5 +1,11 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit();
@@ -18,7 +24,8 @@ $messageType = 'success';
 // Handle Add / Edit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = mysqli_real_escape_string($KONEKSI, trim($_POST['nama'] ?? ''));
-    $organisasi = ($_POST['organisasi'] === 'MPK') ? 'MPK' : 'OSIS';
+    $organisasi_input = isset($_POST['organisasi']) ? trim($_POST['organisasi']) : '';
+    $organisasi = (strtoupper($organisasi_input) === 'MPK') ? 'MPK' : 'OSIS';
     $jabatan = mysqli_real_escape_string($KONEKSI, trim($_POST['jabatan'] ?? ''));
     $role_field = $organisasi . ' - ' . $jabatan;
 
@@ -46,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $updateFoto = $fotoPath !== '' ? "`foto` = '" . mysqli_real_escape_string($KONEKSI, $fotoPath) . "'," : '';
-        $updateSql = "UPDATE intrakulikuler SET $updateFoto `nama` = '" . $nama . "', `role/jabatan` = '" . mysqli_real_escape_string($KONEKSI, $role_field) . "' WHERE id = $id";
+        $updateSql = "UPDATE intrakulikuler SET $updateFoto `nama` = '" . $nama . "', `role_jabatan` = '" . mysqli_real_escape_string($KONEKSI, $role_field) . "' WHERE id = $id";
         if (mysqli_query($KONEKSI, $updateSql)) {
             $message = 'Data berhasil diupdate!';
             $messageType = 'success';
@@ -57,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Insert
         $fotoSql = $fotoPath !== '' ? "'" . mysqli_real_escape_string($KONEKSI, $fotoPath) . "'" : "''";
-        $insertSql = "INSERT INTO intrakulikuler (`foto`, `nama`, `role/jabatan`) VALUES ($fotoSql, '" . $nama . "', '" . mysqli_real_escape_string($KONEKSI, $role_field) . "')";
+        $insertSql = "INSERT INTO intrakulikuler (`foto`, `nama`, `role_jabatan`) VALUES ($fotoSql, '" . $nama . "', '" . mysqli_real_escape_string($KONEKSI, $role_field) . "')";
         if (mysqli_query($KONEKSI, $insertSql)) {
             $message = 'Data berhasil ditambahkan!';
             $messageType = 'success';
@@ -828,7 +835,7 @@ if (isset($_GET['deleted'])) {
                         </thead>
                         <tbody>
                         <?php $i = 1; while ($row = mysqli_fetch_assoc($res)): 
-                            $roleJabatan = $row['role/jabatan'] ?? '';
+                            $roleJabatan = $row['role_jabatan'] ?? '';
                             $isOSIS = stripos($roleJabatan, 'OSIS') === 0;
                             $badgeClass = $isOSIS ? 'osis' : 'mpk';
                             $orgLabel   = $isOSIS ? 'OSIS' : 'MPK';
@@ -896,8 +903,8 @@ if (isset($_GET['deleted'])) {
                     <div class="form-field">
                         <label for="organisasi">Organisasi</label>
                         <select id="organisasi" name="organisasi" class="form-input">
-                            <option value="OSIS" <?= (isset($edit['role/jabatan']) && stripos($edit['role/jabatan'], 'OSIS') === 0) ? 'selected' : '' ?>>OSIS</option>
-                            <option value="MPK"  <?= (isset($edit['role/jabatan']) && stripos($edit['role/jabatan'], 'MPK')  === 0) ? 'selected' : '' ?>>MPK</option>
+                            <option value="OSIS" <?= (isset($edit['role_jabatan']) && stripos($edit['role_jabatan'], 'OSIS') === 0) ? 'selected' : '' ?>>OSIS</option>
+                            <option value="MPK"  <?= (isset($edit['role_jabatan']) && stripos($edit['role_jabatan'], 'MPK')  === 0) ? 'selected' : '' ?>>MPK</option>
                         </select>
                     </div>
 
@@ -910,8 +917,8 @@ if (isset($_GET['deleted'])) {
                             class="form-input"
                             placeholder="Contoh: Ketua, Wakil, Sekretaris…"
                             value="<?php
-                                if (isset($edit['role/jabatan'])) {
-                                    $parts = explode(' - ', $edit['role/jabatan'], 2);
+                                if (isset($edit['role_jabatan'])) {
+                                    $parts = explode(' - ', $edit['role_jabatan'], 2);
                                     echo htmlspecialchars($parts[1] ?? '');
                                 }
                             ?>"

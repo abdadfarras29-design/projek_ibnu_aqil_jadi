@@ -11,11 +11,20 @@ $mpk_members = [];
 
 if ($res) {
     while ($row = mysqli_fetch_assoc($res)) {
-        // Parse role/jabatan to check organization
+        // Parse role_jabatan to check organization
         $org = 'OSIS';
-        $jabatan = $row['role/jabatan'];
-        if (strpos($row['role/jabatan'], ' - ') !== false) {
-            list($org, $jabatan) = explode(' - ', $row['role/jabatan'], 2);
+        $jabatan_raw = $row['role_jabatan'] ?? '';
+        $jabatan = $jabatan_raw;
+        if (strpos($jabatan_raw, ' - ') !== false) {
+            $parts = explode(' - ', $jabatan_raw, 2);
+            $org = trim($parts[0]);
+            $jabatan = trim($parts[1]);
+        } else if (stripos($jabatan_raw, 'MPK') === 0) {
+            $org = 'MPK';
+            $jabatan = trim(substr($jabatan_raw, 3));
+        } else if (stripos($jabatan_raw, 'OSIS') === 0) {
+            $org = 'OSIS';
+            $jabatan = trim(substr($jabatan_raw, 4));
         }
         
         $row['parsed_org'] = $org;
