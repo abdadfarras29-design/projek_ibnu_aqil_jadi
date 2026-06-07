@@ -35,6 +35,7 @@ if ($res_fasilitas) {
                         <li><a href="profile.php">Profil Sekolah</a></li>
                         <li><a href="visi-misi.php">Visi & Misi</a></li>
                         <li><a href="guru-staff.php">Guru & Staff</a></li>
+                        <li><a href="osis-mpk.php">OSIS & MPK</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
