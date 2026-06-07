@@ -76,10 +76,21 @@ function animateCounter(element, target, duration = 2000) {
  * Initialize all counter animations
  */
 function initializeCounters() {
-    animateCounter(document.getElementById('studentCount'), schoolData.students);
-    animateCounter(document.getElementById('teacherCount'), schoolData.teachers);
-    animateCounter(document.getElementById('achievementCount'), schoolData.achievements);
-    animateCounter(document.getElementById('yearCount'), schoolData.yearEstablished);
+    const elStudent = document.getElementById('studentCount');
+    const targetStudent = elStudent && elStudent.getAttribute('data-target') ? parseInt(elStudent.getAttribute('data-target')) : schoolData.students;
+    if (elStudent) animateCounter(elStudent, targetStudent);
+
+    const elTeacher = document.getElementById('teacherCount');
+    const targetTeacher = elTeacher && elTeacher.getAttribute('data-target') ? parseInt(elTeacher.getAttribute('data-target')) : schoolData.teachers;
+    if (elTeacher) animateCounter(elTeacher, targetTeacher);
+
+    const elAchievement = document.getElementById('achievementCount');
+    const targetAchievement = elAchievement && elAchievement.getAttribute('data-target') ? parseInt(elAchievement.getAttribute('data-target')) : schoolData.achievements;
+    if (elAchievement) animateCounter(elAchievement, targetAchievement);
+
+    const elYear = document.getElementById('yearCount');
+    const targetYear = elYear && elYear.getAttribute('data-target') ? parseInt(elYear.getAttribute('data-target')) : schoolData.yearEstablished;
+    if (elYear) animateCounter(elYear, targetYear);
 }
 
 // ===========================

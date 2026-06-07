@@ -76,19 +76,19 @@ $rombel_stat = $statistik_sekolah['rombongan belajar'] ?? '30';
 
         <div class="stats-container">
             <div class="stat-box">
-                <span class="stat-number" id="studentCount">0</span>
+                <span class="stat-number" id="studentCount" data-target="<?php echo htmlspecialchars($siswa_stat); ?>">0</span>
                 <span class="stat-label">Siswa Aktif</span>
             </div>
             <div class="stat-box">
-                <span class="stat-number" id="teacherCount">0</span>
+                <span class="stat-number" id="teacherCount" data-target="<?php echo htmlspecialchars($guru_stat); ?>">0</span>
                 <span class="stat-label">Guru Berkualitas</span>
             </div>
             <div class="stat-box">
-                <span class="stat-number" id="achievementCount">0</span>
+                <span class="stat-number" id="achievementCount" data-target="<?php echo htmlspecialchars($prestasi_stat); ?>">0</span>
                 <span class="stat-label">Prestasi</span>
             </div>
             <div class="stat-box">
-                <span class="stat-number" id="yearCount">0</span>
+                <span class="stat-number" id="yearCount" data-target="<?php echo htmlspecialchars($rombel_stat); ?>">0</span>
                 <span class="stat-label">Rombongan Belajar</span>
             </div>
         </div>
