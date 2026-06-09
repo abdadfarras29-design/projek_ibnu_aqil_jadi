@@ -267,7 +267,7 @@ if ($res_komentar) {
                     <div class="info-icon"><i class='bx bx-envelope'></i></div>
                     <div class="info-content">
                         <h4>Email</h4>
-                        <a href="mailto:info@ibnuaqil.sch.id">info@ibnuaqil.sch.id</a>
+                        <a href="mailto:smpibnuaqilbogor@gmail.com">smpibnuaqilbogor@gmail.com</a>
                     </div>
                 </div>
                 <div class="info-card">
